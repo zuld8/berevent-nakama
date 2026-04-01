@@ -166,13 +166,13 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mt-6 px-3 sm:px-6">
-                <div class="lg:col-span-2 space-y-4">
+            <div class="mt-6 px-4">
+                <div class="space-y-4">
                     {{-- Tabs --}}
                     @php $activeTab = $tab ?? 'detail'; @endphp
                     <div class="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 overflow-hidden">
                         <div class="border-b border-gray-200">
-                            <nav class="flex overflow-x-auto" aria-label="Tabs">
+                            <nav class="flex" aria-label="Tabs">
                                 @php
                                     $tabs = [
                                         'detail' => 'Detail',
@@ -182,24 +182,24 @@
                                 @endphp
                                 @foreach ($tabs as $key => $label)
                                     <a href="{{ request()->fullUrlWithQuery(['tab' => $key]) }}"
-                                       class="whitespace-nowrap px-5 py-3.5 text-sm font-medium transition-colors {{ $activeTab === $key ? 'border-b-2 border-amber-500 text-amber-700 bg-amber-50/50' : 'text-gray-500 hover:text-amber-600 hover:bg-amber-50/30' }}">{{ $label }}</a>
+                                       class="flex-1 text-center whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors {{ $activeTab === $key ? 'border-b-2 border-amber-500 text-amber-700' : 'text-gray-500 hover:text-amber-600' }}">{{ $label }}</a>
                                 @endforeach
                             </nav>
                         </div>
 
-                        <div class="p-5 sm:p-6">
+                        <div class="p-4 sm:p-5">
                             @if ($activeTab === 'detail')
                                 @if ($c->categories->count())
                                     <div class="mb-4 flex flex-wrap gap-2">
                                         @foreach ($c->categories as $cat)
                                             <a href="{{ route('home', ['category' => $cat->slug]) }}"
-                                               class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-200 hover:bg-amber-100 transition-colors">#{{ $cat->name }}</a>
+                                               class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-200">#{{ $cat->name }}</a>
                                         @endforeach
                                     </div>
                                 @endif
 
                                 @if ($c->description_md)
-                                    <article class="prose prose-gray max-w-none prose-headings:text-gray-900 prose-a:text-amber-600">
+                                    <article class="prose max-w-none text-gray-700">
                                         {!! nl2br(e($c->description_md)) !!}
                                     </article>
                                 @elseif ($c->summary)
@@ -210,48 +210,34 @@
                             @elseif ($activeTab === 'laporan')
                                 @if ($articles->count() === 0)
                                     <div class="text-center py-8">
-                                        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <p class="mt-2 text-gray-500">Belum ada laporan penyaluran.</p>
+                                        <p class="text-gray-500">Belum ada laporan penyaluran.</p>
                                     </div>
                                 @else
-                                    <ol class="relative ml-3 border-l-2 border-amber-200">
+                                    <div class="space-y-4">
                                         @foreach ($articles as $a)
-                                            <li class="mb-8 ml-6">
-                                                <span class="absolute -left-2.5 mt-1 h-5 w-5 rounded-full bg-amber-500 ring-4 ring-white"></span>
-                                                <div class="mb-1 text-xs text-gray-400 font-medium">
+                                            <div class="border-l-3 border-amber-400 pl-4">
+                                                <div class="text-xs text-gray-400 mb-1">
                                                     {{ optional($a->published_at)->format('d M Y') ?? '—' }}</div>
-                                                <h3 class="mb-2 text-base font-semibold">
+                                                <h3 class="text-sm font-semibold">
                                                     <a class="text-amber-700 hover:underline"
                                                        href="{{ route('article.show', ['id' => $a->id, 'slug' => \Illuminate\Support\Str::slug($a->title)]) }}">{{ $a->title }}</a>
                                                 </h3>
                                                 @if ($a->payout?->amount)
-                                                    <div class="mb-2 inline-block rounded-full bg-orange-50 px-3 py-1 text-xs font-medium text-orange-700 ring-1 ring-orange-200">
-                                                        Anggaran: Rp {{ number_format((float) $a->payout->amount, 0, ',', '.') }}</div>
+                                                    <span class="inline-block mt-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700">
+                                                        Rp {{ number_format((float) $a->payout->amount, 0, ',', '.') }}</span>
                                                 @endif
-                                                @if ($a->body_md)
-                                                    <div class="prose max-w-none text-gray-600 text-sm">
-                                                        {{ \Illuminate\Support\Str::limit(strip_tags($a->body_md), 280) }}
-                                                    </div>
-                                                    <a class="mt-2 inline-block text-sm text-amber-600 hover:underline font-medium"
-                                                       href="{{ route('article.show', ['id' => $a->id, 'slug' => \Illuminate\Support\Str::slug($a->title)]) }}">Baca selengkapnya →</a>
-                                                @endif
-                                            </li>
+                                            </div>
                                         @endforeach
-                                    </ol>
+                                    </div>
                                     <div class="mt-4">{{ $articles->links() }}</div>
                                 @endif
                             @elseif ($activeTab === 'donatur')
                                 @if ($donations->count() === 0)
                                     <div class="text-center py-8">
-                                        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        <p class="mt-2 text-gray-500">Belum ada donatur. Jadilah yang pertama! 💛</p>
+                                        <p class="text-gray-500">Belum ada donatur. Jadilah yang pertama! 💛</p>
                                     </div>
                                 @else
-                                    <ul class="divide-y divide-gray-50">
+                                    <ul class="divide-y divide-gray-100">
                                         @foreach ($donations as $d)
                                             @php
                                                 $displayName = $d->is_anonymous ? 'Hamba Allah' : ($d->donor_name ?: '—');
@@ -262,19 +248,17 @@
                                                 }
                                                 $initials = mb_strtoupper($initials ?: 'NA');
                                             @endphp
-                                            <li class="flex items-center gap-3 py-3.5">
-                                                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-100 to-orange-100 text-sm font-bold text-amber-700">
+                                            <li class="flex items-center gap-3 py-3">
+                                                <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
                                                     {{ $initials }}</div>
                                                 <div class="min-w-0 flex-1">
-                                                    <div class="flex items-start justify-between gap-3">
-                                                        <div>
-                                                            <div class="text-sm font-semibold text-gray-900">{{ $displayName }}</div>
-                                                            <div class="text-xs text-gray-400">{{ optional($d->paid_at)->diffForHumans() }}</div>
-                                                        </div>
+                                                    <div class="flex items-center justify-between gap-2">
+                                                        <div class="text-sm font-semibold text-gray-900">{{ $displayName }}</div>
                                                         <div class="text-sm font-bold text-amber-600 whitespace-nowrap">Rp {{ number_format((float) $d->amount, 0, ',', '.') }}</div>
                                                     </div>
+                                                    <div class="text-xs text-gray-400">{{ optional($d->paid_at)->diffForHumans() }}</div>
                                                     @if (!empty($d->message))
-                                                        <div class="mt-1.5 text-sm text-gray-600 bg-gray-50 rounded-lg p-2 italic">"{{ $d->message }}"</div>
+                                                        <div class="mt-1 text-xs text-gray-500 italic">"{{ $d->message }}"</div>
                                                     @endif
                                                 </div>
                                             </li>
@@ -286,50 +270,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Desktop Aside --}}
-                <aside class="hidden lg:block">
-                    {{-- Sticky Donate Card --}}
-                    <div class="sticky top-4 space-y-4">
-                        <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-                            <h2 class="text-lg font-bold text-gray-900 mb-3">Dukung Program Ini</h2>
-                            <p class="text-sm text-gray-500 mb-4">Setiap kontribusi Anda sangat berarti untuk mewujudkan perubahan nyata.</p>
-                            <a href="{{ route('campaign.donate.form', $c->slug) }}"
-                               class="block w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3 text-center text-sm font-bold text-white shadow hover:from-amber-600 hover:to-orange-600 transition-all duration-200">
-                                ❤️ Donasi Sekarang
-                            </a>
-                        </div>
-
-                        @if (($related ?? collect())->isNotEmpty())
-                            <div class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-                                <h2 class="mb-3 text-lg font-bold text-gray-900">Program Lainnya</h2>
-                                <div class="space-y-3">
-                                    @foreach ($related as $r)
-                                        @php
-                                            $rCover = $r->cover_url ?: optional($r->media->sortBy('sort_order')->first())->url;
-                                            $rTarget = (float) ($r->target_amount ?? 0);
-                                            $rRaised = (float) ($r->raised_amount ?? 0);
-                                            $rProgress = $rTarget > 0 ? min(100, round(($rRaised / max(1, $rTarget)) * 100)) : 0;
-                                        @endphp
-                                        <a href="{{ route('campaign.show', $r->slug) }}"
-                                           class="group block rounded-lg border border-gray-100 hover:border-amber-200 hover:shadow-sm overflow-hidden transition-all">
-                                            @if ($rCover)
-                                                <img src="{{ $rCover }}" alt="{{ $r->title }}" class="w-full h-28 object-cover" />
-                                            @endif
-                                            <div class="p-3">
-                                                <div class="line-clamp-2 text-sm font-medium text-gray-900 group-hover:text-amber-600">{{ $r->title }}</div>
-                                                <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
-                                                    <div class="h-full rounded-full bg-amber-400" style="width: {{ $rProgress }}%"></div>
-                                                </div>
-                                                <div class="mt-1 text-xs text-gray-400">Rp {{ number_format($rRaised, 0, ',', '.') }} / Rp {{ number_format($rTarget, 0, ',', '.') }}</div>
-                                            </div>
-                                        </a>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                </aside>
             </div>
         </div>
     </main>

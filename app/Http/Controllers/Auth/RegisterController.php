@@ -27,48 +27,48 @@ class RegisterController extends Controller
             'password' => ['required','string','min:8','confirmed'],
         ]);
 
-        // Validate WA number via service if enabled
+        // Normalize phone number via WA service if validation is enabled
         $svc = new WaService();
         $cfg = $svc->getConfig();
-        $waOk = true; $waNumber = $data['phone'];
+        $waNumber = $data['phone'];
         if ($cfg['validate_enabled'] ?? false) {
             $res = $svc->validateNumber($data['phone']);
             $waOk = (bool) ($res['isRegistered'] ?? false);
             $waNumber = (string) ($res['number'] ?? $data['phone']);
-        }
-        if (! $waOk) {
-            return back()->withErrors(['phone' => 'Nomor WhatsApp tidak valid / belum terdaftar.'])->withInput();
+            if (! $waOk) {
+                return back()->withErrors(['phone' => 'Nomor WhatsApp tidak valid / belum terdaftar.'])->withInput();
+            }
         }
 
-        // Create OTP record
-        $code = (string) random_int(100000, 999999);
-        UserOtp::where('phone', $waNumber)->delete();
-        UserOtp::create([
-            'phone' => $waNumber,
-            'code' => $code,
-            'expires_at' => now()->addMinutes(10),
-            'meta_json' => ['email' => $data['email'], 'name' => $data['name'], 'password' => bcrypt($data['password'])],
+        // Create user immediately — no OTP required
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'type' => 'customer',
         ]);
 
-        // Send OTP via WA if enabled
-        if ($cfg['send_enabled'] ?? false) {
-            $template = (string) ($cfg['message_template'] ?? 'Kode OTP registrasi Anda: {otp}. Berlaku 10 menit.');
-            $msg = $svc->renderTemplate($template, [
-                'otp' => $code,
-                'name' => $data['name'],
-                'email' => $data['email'],
-            ]);
-            $svc->sendText($waNumber, $msg);
-        }
+        // Save phone to contact profile
+        try {
+            $user->contact()->firstOrCreate([])->update(['phone' => $waNumber]);
+        } catch (\Throwable $e) {}
 
-        return redirect()->route('register.otp')->with(['phone' => $waNumber]);
+        // Log the user in
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('profile.index');
     }
+
+    // -----------------------------------------------------------------
+    // OTP verification (optional — can be triggered from profile page)
+    // -----------------------------------------------------------------
 
     public function showOtp(Request $request)
     {
         $phone = session('phone');
         if (! $phone) return redirect()->route('register');
-        $row = \App\Models\UserOtp::where('phone', $phone)->first();
+        $row = UserOtp::where('phone', $phone)->first();
         $cooldown = 0;
         if ($row) {
             $meta = $row->meta_json ?? [];
@@ -102,22 +102,29 @@ class RegisterController extends Controller
             return back()->withErrors(['code' => 'Kode tidak sesuai. Sisa percobaan: ' . $left])->withInput();
         }
 
-        // Create user
-        $meta = $row->meta_json ?? [];
-        $user = User::create([
-            'name' => $meta['name'] ?? 'User',
-            'email' => $meta['email'] ?? null,
-            'password' => $meta['password'] ?? Hash::make(str()->random(12)),
-            'type' => 'customer',
-        ]);
-        // Optional: save phone in contact profile if exists
-        try { $user->contact()->firstOrCreate([])->update(['phone' => $row->phone]); } catch (\Throwable $e) {}
+        // If user is already logged in, mark phone as verified
+        if (Auth::check()) {
+            try {
+                Auth::user()->contact()->firstOrCreate([])->update([
+                    'phone' => $row->phone,
+                    'phone_verified_at' => now(),
+                ]);
+            } catch (\Throwable $e) {}
+        } else {
+            // Legacy fallback: create user from OTP meta (for old pending registrations)
+            $meta = $row->meta_json ?? [];
+            $user = User::create([
+                'name' => $meta['name'] ?? 'User',
+                'email' => $meta['email'] ?? null,
+                'password' => $meta['password'] ?? Hash::make(str()->random(12)),
+                'type' => 'customer',
+            ]);
+            try { $user->contact()->firstOrCreate([])->update(['phone' => $row->phone]); } catch (\Throwable $e) {}
+            Auth::login($user);
+            $request->session()->regenerate();
+        }
 
-        // Cleanup OTP
         $row->delete();
-
-        Auth::login($user);
-        $request->session()->regenerate();
         return redirect()->route('profile.index');
     }
 

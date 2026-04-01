@@ -348,9 +348,7 @@ class PaymentController extends Controller
                     'created_at' => now(),
                 ]);
 
-                // Update campaign raised_amount
-                $campaign->raised_amount = (float) $campaign->raised_amount + (float) $amount;
-                $campaign->save();
+                // raised_amount is updated by DonationObserver
             }
 
             // Optionally send WA message on payment success (only once overall)

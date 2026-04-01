@@ -21,18 +21,13 @@ class CampaignResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-megaphone';
 
-    protected static ?string $navigationGroup = 'Manajemen';
+    protected static ?string $navigationGroup = 'Donasi';
 
     protected static ?string $navigationLabel = 'Campaigns';
 
     protected static ?int $navigationSort = 20; // setelah Categories
 
-    protected static bool $shouldRegisterNavigation = false;
 
-    public static function canViewAny(): bool
-    {
-        return false;
-    }
 
     public static function form(Form $form): Form
     {

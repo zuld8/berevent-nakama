@@ -19,20 +19,13 @@ class CampaignArticleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
-    protected static ?string $navigationGroup = 'Laporan';
+    protected static ?string $navigationGroup = 'Donasi';
 
     protected static ?string $navigationLabel = 'Laporan Penyaluran';
 
     protected static ?int $navigationSort = 5;
 
-    protected static bool $shouldRegisterNavigation = false;
 
-    public static function canViewAny(): bool { return false; }
-    public static function canCreate(): bool { return false; }
-    public static function canDeleteAny(): bool { return false; }
-    public static function canView($record): bool { return false; }
-    public static function canEdit($record): bool { return false; }
-    public static function canDelete($record): bool { return false; }
 
     public static function form(Form $form): Form
     {

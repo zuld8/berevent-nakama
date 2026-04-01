@@ -52,10 +52,10 @@ class Hero extends Model
         // Try S3 with signed URL similar to CampaignMedia
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return Storage::disk('s3')->temporaryUrl($path, now()->addSeconds($ttl));
+            return Storage::disk(media_disk())->temporaryUrl($path, now()->addSeconds($ttl));
         } catch (\Throwable) {
             try {
-                return Storage::disk('s3')->url($path);
+                return Storage::disk(media_disk())->url($path);
             } catch (\Throwable) {
                 // Fallback to default disk URL if available
                 try {
@@ -75,7 +75,7 @@ class Hero extends Model
 
             // Attempt delete on both disks as path may have moved over time
             try {
-                \Illuminate\Support\Facades\Storage::disk('s3')->delete($path);
+                \Illuminate\Support\Facades\Storage::disk(media_disk())->delete($path);
             } catch (\Throwable) {
                 // ignore
             }

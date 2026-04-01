@@ -77,7 +77,7 @@ class FactoryResetCommand extends Command
 
         if ($purgeFiles) {
             try {
-                Storage::disk('s3')->deleteDirectory('articles');
+                Storage::disk(media_disk())->deleteDirectory('articles');
                 $this->line('- purged s3://articles');
             } catch (\Throwable $e) {
                 $this->warn('Failed to purge files: ' . $e->getMessage());

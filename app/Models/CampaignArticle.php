@@ -45,9 +45,9 @@ class CampaignArticle extends Model
         }
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return \Illuminate\Support\Facades\Storage::disk('s3')->temporaryUrl($this->cover_path, now()->addSeconds($ttl));
+            return \Illuminate\Support\Facades\Storage::disk(media_disk())->temporaryUrl($this->cover_path, now()->addSeconds($ttl));
         } catch (\Throwable) {
-            return \Illuminate\Support\Facades\Storage::disk('s3')->url($this->cover_path);
+            return \Illuminate\Support\Facades\Storage::disk(media_disk())->url($this->cover_path);
         }
     }
 

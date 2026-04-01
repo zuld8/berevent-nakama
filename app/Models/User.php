@@ -75,10 +75,10 @@ class User extends Authenticatable implements FilamentUser
         // Prefer signed S3 URL similar to Hero/CampaignMedia
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return \Illuminate\Support\Facades\Storage::disk('s3')->temporaryUrl($path, now()->addSeconds($ttl));
+            return \Illuminate\Support\Facades\Storage::disk(media_disk())->temporaryUrl($path, now()->addSeconds($ttl));
         } catch (\Throwable) {
             try {
-                return \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
+                return \Illuminate\Support\Facades\Storage::disk(media_disk())->url($path);
             } catch (\Throwable) {
                 try {
                     return \Illuminate\Support\Facades\Storage::disk(config('filesystems.default', 'public'))->url($path);

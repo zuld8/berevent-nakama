@@ -56,12 +56,12 @@ class HeroResource extends Resource
                                             try {
                                                 $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
                                                 if ($path && is_string($path)) {
-                                                    $url = \Illuminate\Support\Facades\Storage::disk('s3')->temporaryUrl($path, now()->addSeconds($ttl));
+                                                    $url = \Illuminate\Support\Facades\Storage::disk(media_disk())->temporaryUrl($path, now()->addSeconds($ttl));
                                                 }
                                             } catch (\Throwable) {
                                                 try {
                                                     if ($path && is_string($path)) {
-                                                        $url = \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
+                                                        $url = \Illuminate\Support\Facades\Storage::disk(media_disk())->url($path);
                                                     }
                                                 } catch (\Throwable) {
                                                     $url = null;
@@ -79,7 +79,7 @@ class HeroResource extends Resource
                         Forms\Components\FileUpload::make('image_path')
                             ->label('Gambar')
                             ->image()
-                            ->disk('s3')
+                            ->disk(media_disk())
                             ->directory('heroes')
                             ->visibility('private')
                             ->maxSize(5 * 1024)

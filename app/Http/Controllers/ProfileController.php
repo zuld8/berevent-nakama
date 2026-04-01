@@ -54,7 +54,7 @@ class ProfileController extends Controller
         try {
             if ($disk === 's3') {
                 // Store to S3 (private by default); URL will be generated via temporaryUrl accessor
-                $path = $request->file('photo')->store('profiles', 's3');
+                $path = $request->file('photo')->store('profiles', media_disk());
             } else {
                 $path = $request->file('photo')->store('profiles', 'public');
             }
@@ -66,7 +66,7 @@ class ProfileController extends Controller
 
         // Best-effort cleanup on both disks
         try { if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) { Storage::disk('public')->delete($user->profile_photo_path); } } catch (\Throwable) {}
-        try { if ($user->profile_photo_path && Storage::disk('s3')->exists($user->profile_photo_path)) { Storage::disk('s3')->delete($user->profile_photo_path); } } catch (\Throwable) {}
+        try { if ($user->profile_photo_path && Storage::disk(media_disk())->exists($user->profile_photo_path)) { Storage::disk(media_disk())->delete($user->profile_photo_path); } } catch (\Throwable) {}
 
         $user->profile_photo_path = $path;
         $user->save();

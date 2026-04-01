@@ -40,14 +40,14 @@ class CategoryResource extends Resource
                             ->imageEditor()
                             ->imageCropAspectRatio('1:1')
                             ->directory('categories')
-                            ->disk('s3')
+                            ->disk(media_disk())
                             ->visibility('private')
                             ->maxSize(8192)
                             ->saveUploadedFileUsing(function (TemporaryUploadedFile $file, $get) {
                                 $data = file_get_contents($file->getRealPath());
                                 $compressed = ImageCompressor::squareJpegUnder($data, 100 * 1024, 512);
                                 $path = 'categories/' . SupportStr::random(40) . '.jpg';
-                                Storage::disk('s3')->put($path, $compressed, 'private');
+                                Storage::disk(media_disk())->put($path, $compressed, 'private');
                                 return $path;
                             })
                             ->columnSpan(1),

@@ -54,9 +54,9 @@ class Event extends Model
         } catch (\Throwable) {}
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return \Illuminate\Support\Facades\Storage::disk('s3')->temporaryUrl($path, now()->addSeconds($ttl));
+            return \Illuminate\Support\Facades\Storage::disk(media_disk())->temporaryUrl($path, now()->addSeconds($ttl));
         } catch (\Throwable) {
-            try { return \Illuminate\Support\Facades\Storage::disk('s3')->url($path); } catch (\Throwable) { return null; }
+            try { return \Illuminate\Support\Facades\Storage::disk(media_disk())->url($path); } catch (\Throwable) { return null; }
         }
     }
 

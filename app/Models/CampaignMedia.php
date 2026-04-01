@@ -40,10 +40,10 @@ class CampaignMedia extends Model
 
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return Storage::disk('s3')->temporaryUrl($this->path, now()->addSeconds($ttl));
+            return Storage::disk(media_disk())->temporaryUrl($this->path, now()->addSeconds($ttl));
         } catch (\Throwable) {
             // Fallback to regular URL if temporaryUrl is not supported
-            return Storage::disk('s3')->url($this->path);
+            return Storage::disk(media_disk())->url($this->path);
         }
     }
 
@@ -52,7 +52,7 @@ class CampaignMedia extends Model
         static::deleting(function (CampaignMedia $media) {
             if (! empty($media->path)) {
                 try {
-                    Storage::disk('s3')->delete($media->path);
+                    Storage::disk(media_disk())->delete($media->path);
                 } catch (\Throwable) {
                     // ignore delete errors
                 }

@@ -28,7 +28,7 @@ class PageResource extends Resource
                     ->afterStateUpdated(function ($state, $set) { if ($state) $set('slug', Str::slug($state)); }),
                 Forms\Components\TextInput::make('slug')->required()->unique(ignoreRecord: true),
                 Forms\Components\RichEditor::make('body_md')->label('Isi')->columnSpanFull()
-                    ->fileAttachmentsDisk('s3')->fileAttachmentsDirectory('pages')->fileAttachmentsVisibility('private')
+                    ->fileAttachmentsdisk(media_disk())->fileAttachmentsDirectory('pages')->fileAttachmentsVisibility('private')
                     ->toolbarButtons(['bold','italic','underline','strike','link','blockquote','h2','h3','bulletList','orderedList','attachFiles','undo','redo']),
                 Forms\Components\DateTimePicker::make('published_at')->label('Terbit')->seconds(false),
                 Forms\Components\Select::make('status')

@@ -34,9 +34,9 @@ class Mentor extends Model
 
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return Storage::disk('s3')->temporaryUrl($path, now()->addSeconds($ttl));
+            return Storage::disk(media_disk())->temporaryUrl($path, now()->addSeconds($ttl));
         } catch (\Throwable) {
-            try { return Storage::disk('s3')->url($path); } catch (\Throwable) { return null; }
+            try { return Storage::disk(media_disk())->url($path); } catch (\Throwable) { return null; }
         }
     }
 

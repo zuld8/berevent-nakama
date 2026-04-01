@@ -70,7 +70,7 @@ class EventResource extends Resource
                             ->imageEditor()
                             ->imageCropAspectRatio('1:1')
                             ->directory('events')
-                            ->disk('s3')
+                            ->disk(media_disk())
                             ->visibility('private')
                             ->maxSize(8192)
                             ->saveUploadedFileUsing(function (TemporaryUploadedFile $file, $get) {
@@ -78,7 +78,7 @@ class EventResource extends Resource
                                 // compress to ~200KB, 1:1 square (e.g., 1024x1024)
                                 $compressed = ImageCompressor::squareJpegUnder($data, 200 * 1024, 1024);
                                 $path = 'events/' . Str::random(40) . '.jpg';
-                                Storage::disk('s3')->put($path, $compressed, 'private');
+                                Storage::disk(media_disk())->put($path, $compressed, 'private');
                                 return $path;
                             }),
                         Forms\Components\RichEditor::make('description')->label('Deskripsi')->columnSpanFull(),

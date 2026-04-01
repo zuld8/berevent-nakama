@@ -31,9 +31,9 @@ class News extends Model
         if (! $this->cover_path) return null;
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return Storage::disk('s3')->temporaryUrl($this->cover_path, now()->addSeconds($ttl));
+            return Storage::disk(media_disk())->temporaryUrl($this->cover_path, now()->addSeconds($ttl));
         } catch (\Throwable) {
-            return Storage::disk('s3')->url($this->cover_path);
+            return Storage::disk(media_disk())->url($this->cover_path);
         }
     }
 

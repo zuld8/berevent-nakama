@@ -61,7 +61,7 @@ class CampaignArticleResource extends Resource
                         Forms\Components\FileUpload::make('cover_path')
                             ->label('Cover Image')
                             ->image()
-                            ->disk('s3')
+                            ->disk(media_disk())
                             ->directory('articles/covers')
                             ->visibility('private')
                             ->imageEditor()
@@ -71,7 +71,7 @@ class CampaignArticleResource extends Resource
                         Forms\Components\RichEditor::make('body_md')
                             ->label('Isi')
                             ->columnSpanFull()
-                            ->fileAttachmentsDisk('s3')
+                            ->fileAttachmentsdisk(media_disk())
                             ->fileAttachmentsDirectory('articles')
                             ->fileAttachmentsVisibility('private')
                             ->toolbarButtons([

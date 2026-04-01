@@ -70,8 +70,8 @@ class OrderResource extends Resource
                         $path = (string) data_get($record->meta_json, 'manual.proof_path');
                         $url = null;
                         if ($path) {
-                            try { $url = \Illuminate\Support\Facades\Storage::disk('s3')->temporaryUrl($path, now()->addMinutes(10)); }
-                            catch (\Throwable) { $url = \Illuminate\Support\Facades\Storage::disk('s3')->url($path); }
+                            try { $url = \Illuminate\Support\Facades\Storage::disk(media_disk())->temporaryUrl($path, now()->addMinutes(10)); }
+                            catch (\Throwable) { $url = \Illuminate\Support\Facades\Storage::disk(media_disk())->url($path); }
                         }
                         return view('filament.orders.manual-proof', ['url' => $url, 'record' => $record]);
                     })

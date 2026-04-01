@@ -25,8 +25,8 @@ class OrderPaymentController extends Controller
         ];
         $qrUrl = null;
         if (! empty($bank['qr_path'])) {
-            try { $qrUrl = \Illuminate\Support\Facades\Storage::disk('s3')->temporaryUrl($bank['qr_path'], now()->addMinutes(10)); }
-            catch (\Throwable) { $qrUrl = \Illuminate\Support\Facades\Storage::disk('s3')->url($bank['qr_path']); }
+            try { $qrUrl = \Illuminate\Support\Facades\Storage::disk(media_disk())->temporaryUrl($bank['qr_path'], now()->addMinutes(10)); }
+            catch (\Throwable) { $qrUrl = \Illuminate\Support\Facades\Storage::disk(media_disk())->url($bank['qr_path']); }
         }
         return view('order.manual', compact('order','bank','qrUrl'));
     }
@@ -38,7 +38,7 @@ class OrderPaymentController extends Controller
             'proof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
             'note' => ['nullable', 'string', 'max:1000'],
         ]);
-        $path = $request->file('proof')->store('orders/manual/proofs', ['disk' => 's3', 'visibility' => 'private']);
+        $path = $request->file('proof')->store('orders/manual/proofs', ['disk' => media_disk(), 'visibility' => 'private']);
         $meta = $order->meta_json ?? [];
         $meta['manual'] = [
             'status' => 'pending',

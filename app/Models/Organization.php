@@ -40,9 +40,9 @@ class Organization extends Model
         }
         try {
             $ttl = (int) (env('S3_SIGNED_URL_TTL', 300));
-            return \Illuminate\Support\Facades\Storage::disk('s3')->temporaryUrl($this->logo_path, now()->addSeconds($ttl));
+            return \Illuminate\Support\Facades\Storage::disk(media_disk())->temporaryUrl($this->logo_path, now()->addSeconds($ttl));
         } catch (\Throwable) {
-            return \Illuminate\Support\Facades\Storage::disk('s3')->url($this->logo_path);
+            return \Illuminate\Support\Facades\Storage::disk(media_disk())->url($this->logo_path);
         }
     }
 

@@ -44,7 +44,7 @@ class MediaRelationManager extends RelationManager
                         Forms\Components\FileUpload::make('path')
                             ->label('Gambar')
                             ->image()
-                            ->disk('s3')
+                            ->disk(media_disk())
                             ->directory('campaign-media')
                             ->visibility('private')
                             ->maxSize(5 * 1024) // ~5MB

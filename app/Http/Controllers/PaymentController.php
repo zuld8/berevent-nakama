@@ -62,9 +62,9 @@ class PaymentController extends Controller
         $qrUrl = null;
         if (! empty($bank['qr_path'])) {
             try {
-                $qrUrl = Storage::disk('s3')->temporaryUrl($bank['qr_path'], now()->addMinutes(10));
+                $qrUrl = Storage::disk(media_disk())->temporaryUrl($bank['qr_path'], now()->addMinutes(10));
             } catch (\Throwable) {
-                $qrUrl = Storage::disk('s3')->url($bank['qr_path']);
+                $qrUrl = Storage::disk(media_disk())->url($bank['qr_path']);
             }
         }
 
@@ -90,7 +90,7 @@ class PaymentController extends Controller
             return back()->withErrors(['proof' => 'Transaksi manual tidak ditemukan.'])->withInput();
         }
 
-        $path = $request->file('proof')->store('manual-payments/proofs', ['disk' => 's3', 'visibility' => 'private']);
+        $path = $request->file('proof')->store('manual-payments/proofs', ['disk' => media_disk(), 'visibility' => 'private']);
         $payment->manual_proof_path = $path;
         $payment->manual_note = $data['note'] ?? null;
         $payment->manual_status = 'pending';

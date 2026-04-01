@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Brand palette overrides */
+    /* Primary (Orange) #F26722 scale */
+    --color-orange-50:  #FFF4EC;
+    --color-orange-100: #FFE6D7;
+    --color-orange-200: #FFC8AE;
+    --color-orange-300: #FFA480;
+    --color-orange-400: #FF7F4F;
+    --color-orange-500: #F26722; /* primary */
+    --color-orange-600: #DE5C1F;
+    --color-orange-700: #C4501C;
+    --color-orange-800: #A84418;
+    --color-orange-900: #7A3011;
+    --color-orange-950: #4F1D0B;
+
+    /* Light Accent (Gold) using sky scale */
+    --color-sky-50:  #FFFBEB;
+    --color-sky-100: #FFF3C4;
+    --color-sky-200: #FFE380;
+    --color-sky-300: #FED24A;
+    --color-sky-400: #FEC20E; /* light accent */
+    --color-sky-500: #F4B60D;
+    --color-sky-600: #D79C0B;
+    --color-sky-700: #B88209;
+    --color-sky-800: #946606;
+    --color-sky-900: #6B4904;
+    --color-sky-950: #473103;
+
+    /* Text + Background adjustments via gray scale */
+    --color-gray-50:  #FEF7E5; /* paper */
+    --color-gray-900: #27130B; /* text */
+}
+
+/* Optional base colors for body */
+@layer base {
+    body {
+        color: var(--color-gray-900);
+        background-color: var(--color-gray-50);
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+}
+
+/* Storefront fixed-width mobile view */
+@layer components {
+    .storefront-fixed {
+        --sf-max: 420px; /* target mobile canvas width */
+        --bottom-nav-h: 72px; /* bottom navigation height */
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        overflow-x: clip;
+    }
+
+    /* Constrain common container patterns */
+    .storefront-fixed .mx-auto { max-width: var(--sf-max); }
+    .storefront-fixed .max-w-7xl,
+    .storefront-fixed .max-w-5xl,
+    .storefront-fixed .max-w-2xl,
+    .storefront-fixed .max-w-xl,
+    .storefront-fixed .max-w-lg,
+    .storefront-fixed .max-w-md,
+    .storefront-fixed .max-w-sm { max-width: var(--sf-max) !important; }
+
+    .storefront-fixed header .mx-auto,
+    .storefront-fixed main.mx-auto,
+    .storefront-fixed footer .mx-auto { max-width: var(--sf-max) !important; }
+
+    /* Ensure images and embeds scale within the fixed canvas */
+    .storefront-fixed img, .storefront-fixed video, .storefront-fixed iframe {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Hide horizontal scrollbar utility */
+    .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+
+    /* Bottom nav layout */
+    .bottom-nav { height: calc(var(--bottom-nav-h) + var(--safe-bottom)); padding-bottom: var(--safe-bottom); }
+    .bottom-nav > .mx-auto { max-width: var(--sf-max); }
+
+    /* Content wrapper reserves space for nav and fills viewport */
+    .sf-canvas { min-height: calc(100vh - (var(--bottom-nav-h) + var(--safe-bottom))); padding-bottom: calc(var(--bottom-nav-h) + var(--safe-bottom)); }
+
+    /* Prevent children from causing horizontal overflow */
+    .storefront-fixed * { max-width: 100%; }
+    .storefront-fixed .flex, .storefront-fixed .grid { min-width: 0; }
+}
+
+/* Hide horizontal scrollbar in hero slider while keeping programmatic scrolling */
+#hero-track {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;    /* Firefox */
+}
+#hero-track::-webkit-scrollbar { /* Chrome/Safari */
+    display: none;
+}

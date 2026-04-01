@@ -1,0 +1,16 @@
+/* Custom Filament admin theme overrides */
+
+/* Force sidebar background to white in both light & dark modes */
+/* .fi-sidebar {
+  background-color: #ffffff !important;
+}
+
+.dark .fi-sidebar {
+  background-color: #ffffff !important;
+} */
+
+/* Optional: slightly round active/hovered items for a cleaner look */
+/* .fi-sidebar .fi-sidebar-item a {
+  border-radius: 0.5rem;
+} */
+

@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Event;
+use Illuminate\Http\Request;
+
+class CartController extends Controller
+{
+    protected function getItems(Request $request): array
+    {
+        return (array) $request->session()->get('cart.items', []);
+    }
+
+    protected function putItems(Request $request, array $items): void
+    {
+        $request->session()->put('cart.items', $items);
+    }
+
+    public function index(Request $request)
+    {
+        $items = $this->getItems($request);
+        $total = 0.0;
+        foreach ($items as $it) {
+            $total += (float)($it['unit_price'] ?? 0) * (int)($it['qty'] ?? 1);
+        }
+        return view('cart.index', [
+            'items' => $items,
+            'total' => $total,
+        ]);
+    }
+
+    public function add(Request $request, Event $event)
+    {
+        $items = $this->getItems($request);
+        $key = (string) $event->slug;
+        $unitPrice = 0.0;
+
+        // Handle fixed price
+        if (($event->price_type ?? 'fixed') === 'fixed' && (float)($event->price ?? 0) > 0) {
+            $unitPrice = (float) $event->price;
+        }
+        // Handle dynamic price (donation)
+        elseif (($event->price_type ?? 'fixed') !== 'fixed') {
+            $customPrice = $request->input('custom_price');
+            if ($customPrice !== null && (float)$customPrice >= 10000) {
+                $unitPrice = (float) $customPrice;
+            } else {
+                return redirect()->back()->with('error', 'Silakan pilih nominal donasi minimal Rp 10.000');
+            }
+        }
+
+        if (!isset($items[$key])) {
+            $items[$key] = [
+                'id' => $event->id,
+                'slug' => $event->slug,
+                'title' => $event->title,
+                'cover_url' => $event->cover_url,
+                'unit_price' => $unitPrice,
+                'price_type' => $event->price_type,
+                'qty' => 1,
+            ];
+        } else {
+            $items[$key]['qty'] = (int)($items[$key]['qty'] ?? 1) + 1;
+            // Update price for dynamic pricing if provided
+            if (($event->price_type ?? 'fixed') !== 'fixed' && $request->input('custom_price')) {
+                $items[$key]['unit_price'] = $unitPrice;
+            }
+        }
+        $this->putItems($request, $items);
+        return redirect()->route('cart.index')->with('status', 'Ditambahkan ke keranjang');
+    }
+
+    public function update(Request $request, Event $event)
+    {
+        $qty = max(0, (int) $request->input('qty', 1));
+        $items = $this->getItems($request);
+        $key = (string) $event->slug;
+        if (isset($items[$key])) {
+            if ($qty <= 0) {
+                unset($items[$key]);
+            } else {
+                $items[$key]['qty'] = $qty;
+            }
+            $this->putItems($request, $items);
+        }
+        return redirect()->route('cart.index');
+    }
+
+    public function remove(Request $request, Event $event)
+    {
+        $items = $this->getItems($request);
+        $key = (string) $event->slug;
+        if (isset($items[$key])) {
+            unset($items[$key]);
+            $this->putItems($request, $items);
+        }
+        return redirect()->route('cart.index');
+    }
+
+    public function clear(Request $request)
+    {
+        $request->session()->forget('cart.items');
+        return redirect()->route('cart.index');
+    }
+}
+

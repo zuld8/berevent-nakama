@@ -80,7 +80,7 @@
         </div>
     </header>
 
-    <main class="mx-auto max-w-7xl mb-4">
+    <main class="mx-auto max-w-7xl mb-4 pb-20">
         <div class="content-wrap">
             @php
                 // Use new cover_path first, fallback to old media system
@@ -279,52 +279,52 @@
         $encUrlFab = urlencode($shareUrlFab);
         $encTextFab = urlencode($shareTextFab);
     @endphp
-    <div id="fab-share-bar" class="fixed inset-x-0 bottom-0 z-30 bg-white backdrop-blur border-t border-gray-200 transform transition-all duration-200 ease-out translate-y-full opacity-0 pointer-events-none">
+    <div id="fab-share-bar" class="fixed inset-x-0 bottom-0 z-30 bg-white border-t border-gray-200 shadow-lg">
         <div class="mx-auto max-w-7xl px-4 py-3 flex items-center gap-3">
             <button type="button" id="fab-share-trigger"
-                    class="inline-flex items-center justify-center rounded-md border border-orange-500 bg-white px-4 py-2.5 text-sm font-semibold text-orange-600 shadow-sm hover:bg-orange-50"
+                    class="inline-flex items-center justify-center rounded-lg border border-orange-400 bg-white px-5 py-2.5 text-sm font-semibold text-orange-600 hover:bg-orange-50 transition-colors"
                     aria-label="Bagikan">Bagikan</button>
             <a href="{{ route('campaign.donate.form', $c->slug) }}"
-               class="flex-1 inline-flex items-center justify-center rounded-md bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-orange-600">Donasi</a>
+               class="flex-1 inline-flex items-center justify-center rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-orange-600 transition-colors">Donasi</a>
 
             <div id="fab-share-popover"
-                 class="pointer-events-auto invisible absolute bottom-14 right-4 translate-y-2 opacity-0 transition-all duration-150 ease-out">
-                <div class="flex items-center gap-3 rounded-xl bg-white p-2 shadow-lg ring-1 ring-gray-200">
+                 class="pointer-events-auto invisible absolute bottom-14 left-4 right-4 translate-y-2 opacity-0 transition-all duration-150 ease-out">
+                <div class="flex items-center justify-center gap-3 rounded-xl bg-white p-3 shadow-lg ring-1 ring-gray-200">
                     <a href="https://wa.me/?text={{ $encTextFab }}%20{{ $encUrlFab }}" target="_blank" rel="noopener"
-                       class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-90"
+                       class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-90"
                        aria-label="WhatsApp">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                            <path
-                                  d="M20.52 3.48A11.93 11.93 0 0012.05 0C5.53.02.25 5.29.27 11.81a11.76 11.76 0 001.64 6.07L0 24l6.3-1.82a11.86 11.86 0 005.73 1.49h.01c6.52 0 11.8-5.27 11.82-11.79a11.8 11.8 0 00-3.34-8.4z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                            <path d="M20.52 3.48A11.93 11.93 0 0012.05 0C5.53.02.25 5.29.27 11.81a11.76 11.76 0 001.64 6.07L0 24l6.3-1.82a11.86 11.86 0 005.73 1.49h.01c6.52 0 11.8-5.27 11.82-11.79a11.8 11.8 0 00-3.34-8.4z" />
                         </svg>
                     </a>
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ $encUrlFab }}" target="_blank"
-                       rel="noopener"
-                       class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-90"
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ $encUrlFab }}" target="_blank" rel="noopener"
+                       class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-90"
                        aria-label="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                            <path
-                                  d="M13.5 2.25a6.75 6.75 0 00-6.75 6.75v2.25H4.5a.75.75 0 00-.75 .75v3a.75.75 0 00.75 .75h2.25V21a.75.75 0 00.75 .75h3a.75.75 0 00.75 -.75v-5.25H14.6a.75.75 0 00.74 -.63l.38-3a.75.75 0 00-.74-.87H11.25V9a2.25 2.25 0 012.25 -2.25H15a.75.75 0 00.75 -.75V3a.75.75 0 00-.75 -.75h-1.5z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                            <path d="M13.5 2.25a6.75 6.75 0 00-6.75 6.75v2.25H4.5a.75.75 0 00-.75 .75v3a.75.75 0 00.75 .75h2.25V21a.75.75 0 00.75 .75h3a.75.75 0 00.75 -.75v-5.25H14.6a.75.75 0 00.74 -.63l.38-3a.75.75 0 00-.74-.87H11.25V9a2.25 2.25 0 012.25 -2.25H15a.75.75 0 00.75 -.75V3a.75.75 0 00-.75 -.75h-1.5z" />
                         </svg>
                     </a>
-                    <a href="https://twitter.com/intent/tweet?text={{ $encTextFab }}&url={{ $encUrlFab }}"
-                       target="_blank" rel="noopener"
-                       class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black text-white hover:opacity-90"
+                    <a href="https://twitter.com/intent/tweet?text={{ $encTextFab }}&url={{ $encUrlFab }}" target="_blank" rel="noopener"
+                       class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-black text-white hover:opacity-90"
                        aria-label="X">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                            <path
-                                  d="M18.244 2H21l-6.52 7.455L22 22h-6.828l-5.34-7.027L3.6 22H1l7.035-8.04L2 2h6.914l4.83 6.42L18.244 2zm-2.392 18h1.662L7.225 4H5.47l10.382 16z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                            <path d="M18.244 2H21l-6.52 7.455L22 22h-6.828l-5.34-7.027L3.6 22H1l7.035-8.04L2 2h6.914l4.83 6.42L18.244 2zm-2.392 18h1.662L7.225 4H5.47l10.382 16z" />
                         </svg>
                     </a>
-                    <a href="https://t.me/share/url?url={{ $encUrlFab }}&text={{ $encTextFab }}" target="_blank"
-                       rel="noopener"
-                       class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#229ED9] text-white hover:opacity-90"
+                    <a href="https://t.me/share/url?url={{ $encUrlFab }}&text={{ $encTextFab }}" target="_blank" rel="noopener"
+                       class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#229ED9] text-white hover:opacity-90"
                        aria-label="Telegram">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                            <path
-                                  d="M9.04 15.36l-.37 5.2c.53 0 .76-.23 1.03-.5l2.48-2.38 5.14 3.77c.94 .52 1.6 .25 1.84 -.87l3.34 -15.71h.01c.3 -1.42 -.51 -1.98 -1.43 -1.63L1.4 9.93C.02 10.48 .04 11.3 1.14 11.64l5.2 1.62 12.06 -7.6c.57 -.35 1.1 -.16 .67 .22L9.04 15.36z" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5">
+                            <path d="M9.04 15.36l-.37 5.2c.53 0 .76-.23 1.03-.5l2.48-2.38 5.14 3.77c.94 .52 1.6 .25 1.84 -.87l3.34 -15.71h.01c.3 -1.42 -.51 -1.98 -1.43 -1.63L1.4 9.93C.02 10.48 .04 11.3 1.14 11.64l5.2 1.62 12.06 -7.6c.57 -.35 1.1 -.16 .67 .22L9.04 15.36z" />
                         </svg>
                     </a>
+                    <button type="button" id="fab-copy-link"
+                            class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-600 text-white hover:opacity-90"
+                            aria-label="Copy Link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.702a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.243 8.81" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -435,20 +435,18 @@
         });
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePop(); });
 
-        // Show bottom bar only after scrolling down a bit
+        // Copy link button
         (function () {
-            const bar = document.getElementById('fab-share-bar');
-            if (!bar) return;
-            const update = () => {
-                const y = window.scrollY || window.pageYOffset || 0;
-                if (y > 200) {
-                    bar.classList.remove('translate-y-full', 'opacity-0', 'pointer-events-none');
-                } else {
-                    bar.classList.add('translate-y-full', 'opacity-0', 'pointer-events-none');
-                }
-            };
-            update();
-            window.addEventListener('scroll', update, { passive: true });
+            const copyBtn = document.getElementById('fab-copy-link');
+            if (!copyBtn) return;
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText('{{ route('campaign.show', $c->slug) }}').then(() => {
+                    copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-2.702a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.243 8.81" /></svg>';
+                    }, 1500);
+                });
+            });
         })();
     </script>
 </body>

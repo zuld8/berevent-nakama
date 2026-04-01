@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Category;
+use App\Models\Campaign;
 use App\Models\Organization;
 use App\Models\News;
 use Illuminate\Http\Request;
@@ -62,6 +63,13 @@ class HomeController extends Controller
             ->take(3)
             ->get(['id','title','slug','excerpt','cover_path','published_at','author_id']);
 
+        // Active campaigns for homepage
+        $campaigns = Campaign::query()
+            ->where('status', 'active')
+            ->orderByDesc('updated_at')
+            ->take(6)
+            ->get();
+
         return view('home', [
             'events' => $events,
             'categories' => $categories,
@@ -72,6 +80,7 @@ class HomeController extends Controller
             'heroes' => $heroes,
             'latestNews' => $latestNews,
             'categoryItems' => $categoryItems,
+            'campaigns' => $campaigns,
         ]);
     }
 

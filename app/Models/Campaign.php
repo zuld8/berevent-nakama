@@ -38,6 +38,12 @@ class Campaign extends Model
         'location_json' => 'array',
     ];
 
+    public function getCoverUrlAttribute(): ?string
+    {
+        if (! $this->cover_path) return null;
+        return \Illuminate\Support\Facades\Storage::disk(media_disk())->url($this->cover_path);
+    }
+
     public function organization()
     {
         return $this->belongsTo(Organization::class);

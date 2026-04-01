@@ -31,6 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('Nakama Project Hub')
             ->sidebarCollapsibleOnDesktop()
             ->collapsibleNavigationGroups()
             ->sidebarWidth('18rem')
@@ -46,6 +47,10 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\HelloWidget::class,
+                Widgets\StatsOverview::class,
+                Widgets\RevenueChart::class,
+                Widgets\LatestOrders::class,
+                Widgets\LatestDonations::class,
             ])
             // Define nicer grouped navigation and a quick website link
             ->navigationGroups([

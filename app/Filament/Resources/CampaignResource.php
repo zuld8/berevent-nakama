@@ -53,7 +53,10 @@ class CampaignResource extends Resource
                     ->columns(2)
                     ->schema([
                         Forms\Components\Hidden::make('organization_id')
-                            ->default(fn () => Organization::query()->value('id')),
+                            ->default(fn () => Organization::firstOrCreate(
+                                ['id' => 1],
+                                ['name' => 'Nakama Project Hub', 'slug' => 'nakama-project-hub']
+                            )->id),
 
                         Forms\Components\TextInput::make('title')
                             ->label('Judul')

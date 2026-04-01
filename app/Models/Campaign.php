@@ -14,6 +14,7 @@ class Campaign extends Model
         'organization_id',
         'title',
         'slug',
+        'cover_path',
         'summary',
         'meta_title',
         'meta_description',

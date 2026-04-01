@@ -33,6 +33,22 @@ class CampaignResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Cover Campaign')
+                    ->schema([
+                        Forms\Components\FileUpload::make('cover_path')
+                            ->label('Banner / Cover')
+                            ->image()
+                            ->disk(media_disk())
+                            ->directory('campaigns/covers')
+                            ->visibility('public')
+                            ->imageEditor()
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('16:9')
+                            ->imagePreviewHeight('250')
+                            ->columnSpanFull()
+                            ->helperText('Rekomendasi: 1200x630px (rasio 16:9)'),
+                    ]),
+
                 Forms\Components\Section::make('Informasi Utama')
                     ->columns(2)
                     ->schema([

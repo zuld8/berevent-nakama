@@ -65,6 +65,7 @@ class HomeController extends Controller
 
         // Active campaigns for homepage
         $campaigns = Campaign::query()
+            ->with('organization')
             ->where('status', 'active')
             ->orderByDesc('updated_at')
             ->take(6)

@@ -104,6 +104,9 @@
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white drop-shadow-lg leading-tight">
                             {{ $c->title }}
                         </h1>
+                        @if ($c->organization)
+                            <p class="mt-1 text-sm text-white/80">by {{ $c->organization->name }}</p>
+                        @endif
                         @if ($c->summary)
                             <p class="mt-2 text-sm sm:text-base text-white/90 line-clamp-2 max-w-2xl">{{ $c->summary }}</p>
                         @endif
@@ -115,6 +118,9 @@
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
                             {{ $c->title }}
                         </h1>
+                        @if ($c->organization)
+                            <p class="mt-1 text-sm text-white/80">by {{ $c->organization->name }}</p>
+                        @endif
                         @if ($c->summary)
                             <p class="mt-2 text-sm sm:text-base text-white/90 line-clamp-2 max-w-2xl">{{ $c->summary }}</p>
                         @endif

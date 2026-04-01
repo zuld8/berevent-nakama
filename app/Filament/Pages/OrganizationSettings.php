@@ -27,7 +27,9 @@ class OrganizationSettings extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Organisasi';
 
-    protected static ?int $navigationSort = 5; // paling atas di grup
+    protected static ?int $navigationSort = 5;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $slug = 'organization';
 

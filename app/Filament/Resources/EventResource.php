@@ -31,6 +31,14 @@ class EventResource extends Resource
                 Forms\Components\Section::make('Informasi Event')
                     ->columns(2)
                     ->schema([
+                        Forms\Components\Select::make('organization_id')
+                            ->label('Organisasi')
+                            ->relationship('organization', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->native(false)
+                            ->placeholder('Pilih organisasi')
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('title')->label('Judul')->required()->maxLength(255),
                         Forms\Components\Select::make('category_id')->label('Kategori')
                             ->relationship('category', 'name')

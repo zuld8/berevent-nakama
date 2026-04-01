@@ -52,11 +52,15 @@ class CampaignResource extends Resource
                 Forms\Components\Section::make('Informasi Utama')
                     ->columns(2)
                     ->schema([
-                        Forms\Components\Hidden::make('organization_id')
-                            ->default(fn () => Organization::firstOrCreate(
-                                ['id' => 1],
-                                ['name' => 'Nakama Project Hub', 'slug' => 'nakama-project-hub']
-                            )->id),
+                        Forms\Components\Select::make('organization_id')
+                            ->label('Organisasi')
+                            ->relationship('organization', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required()
+                            ->native(false)
+                            ->placeholder('Pilih organisasi')
+                            ->columnSpanFull(),
 
                         Forms\Components\TextInput::make('title')
                             ->label('Judul')

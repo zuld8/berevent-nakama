@@ -11,6 +11,7 @@ class Event extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'organization_id',
         'title',
         'slug',
         'category_id',
@@ -31,6 +32,11 @@ class Event extends Model
         'end_date' => 'datetime',
         'price' => 'decimal:2',
     ];
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class);
+    }
 
     public function category()
     {

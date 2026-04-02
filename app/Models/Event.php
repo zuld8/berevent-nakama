@@ -25,12 +25,14 @@ class Event extends Model
         'type',
         'description',
         'status',
+        'meta_json',
     ];
 
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'price' => 'decimal:2',
+        'meta_json' => 'array',
     ];
 
     public function organization()

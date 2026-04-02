@@ -123,6 +123,52 @@ class EventResource extends Resource
                             ->addActionLabel('Tambah Materi')
                             ->columnSpanFull(),
                     ])->columnSpanFull(),
+
+                Forms\Components\Section::make('📱 Follow-Up Text')
+                    ->description('Atur teks follow-up WhatsApp per event. Gunakan placeholder: {name}, {reference}, {total}, {event_title}, {pay_url}')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\Tabs::make('followup_tabs')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('🟢 Welcome')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('meta_json.followup_text.welcome')
+                                            ->label('Pesan Welcome')
+                                            ->rows(6)
+                                            ->placeholder("Assalamu'alaikum {name},\n\nTerima kasih telah mendaftar di {event_title}.\nRef: {reference}\nTotal: {total}\n\nSilakan selesaikan pembayaran:\n{pay_url}")
+                                            ->helperText('Dikirim saat pesanan baru dibuat.'),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 1')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('meta_json.followup_text.fu1')
+                                            ->label('Follow Up 1')
+                                            ->rows(6)
+                                            ->placeholder("Halo {name},\n\nPembayaran untuk {event_title} belum kami terima.\nRef: {reference} | Total: {total}\n\nYuk segera selesaikan:\n{pay_url}"),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 2')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('meta_json.followup_text.fu2')
+                                            ->label('Follow Up 2')
+                                            ->rows(6)
+                                            ->placeholder("Hai {name},\n\nJangan lewatkan kesempatan mengikuti {event_title}.\nSegera selesaikan pembayaran:\n{pay_url}"),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 3')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('meta_json.followup_text.fu3')
+                                            ->label('Follow Up 3')
+                                            ->rows(6)
+                                            ->placeholder("Terakhir kami ingatkan {name},\n\nPendaftaran {event_title} akan segera ditutup.\n{pay_url}"),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('✅ Paid')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('meta_json.followup_text.paid')
+                                            ->label('Konfirmasi Bayar')
+                                            ->rows(6)
+                                            ->placeholder("Alhamdulillah {name}! 🎉\n\nPembayaran untuk {event_title} berhasil.\nRef: {reference}\n\nSampai jumpa di event!"),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ])->columnSpanFull(),
             ]);
     }
 

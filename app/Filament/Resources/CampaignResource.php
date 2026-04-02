@@ -160,6 +160,52 @@ class CampaignResource extends Resource
                             ->columnSpanFull()
                             ->helperText('Opsional. Default: ringkasan campaign.'),
                     ]),
+
+                Forms\Components\Section::make('📱 Follow-Up Text')
+                    ->description('Atur teks follow-up WhatsApp per campaign. Gunakan placeholder: {donor_name}, {reference}, {amount}, {campaign_title}, {pay_url}')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\Tabs::make('followup_tabs')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('🟢 Welcome')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('settings_json.followup_text.welcome')
+                                            ->label('Pesan Welcome')
+                                            ->rows(6)
+                                            ->placeholder("Assalamu'alaikum {donor_name},\n\nTerima kasih atas niat baik Anda berdonasi di {campaign_title}.\nRef: {reference}\nNominal: {amount}\n\nSilakan selesaikan pembayaran:\n{pay_url}")
+                                            ->helperText('Dikirim saat donasi baru dibuat.'),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 1')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('settings_json.followup_text.fu1')
+                                            ->label('Follow Up 1')
+                                            ->rows(6)
+                                            ->placeholder("Halo {donor_name},\n\nPembayaran donasi untuk {campaign_title} belum kami terima.\nRef: {reference} | Nominal: {amount}\n\nYuk segera selesaikan:\n{pay_url}"),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 2')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('settings_json.followup_text.fu2')
+                                            ->label('Follow Up 2')
+                                            ->rows(6)
+                                            ->placeholder("Hai {donor_name},\n\nJangan lewatkan kesempatan berdonasi di {campaign_title}.\nSegera selesaikan pembayaran:\n{pay_url}"),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 3')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('settings_json.followup_text.fu3')
+                                            ->label('Follow Up 3')
+                                            ->rows(6)
+                                            ->placeholder("Terakhir kami ingatkan {donor_name},\n\nDonasi Anda untuk {campaign_title} masih menunggu pembayaran.\n{pay_url}"),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('✅ Paid')
+                                    ->schema([
+                                        Forms\Components\Textarea::make('settings_json.followup_text.paid')
+                                            ->label('Konfirmasi Bayar')
+                                            ->rows(6)
+                                            ->placeholder("Alhamdulillah {donor_name}! 🙏\n\nDonasi Anda untuk {campaign_title} sebesar {amount} berhasil diterima.\nRef: {reference}\n\nSemoga menjadi amal jariyah."),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+                    ])->columnSpanFull(),
             ]);
     }
 

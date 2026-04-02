@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Filament\Resources\OrderResource\RelationManagers\TicketsRelationManager;
+use App\Filament\Resources\OrderResource\Widgets\OrderStatsOverview;
 use App\Models\Order;
 use Filament\Resources\Resource;
 use Filament\Forms;
@@ -24,15 +25,29 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('reference')->label('Ref')->searchable()->copyable()->copyMessage('Copied'),
-                Tables\Columns\TextColumn::make('user.name')->label('User')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('reference')->label('Ref')
+                    ->searchable()->copyable()->copyMessage('Copied')
+                    ->weight('bold')
+                    ->size(Tables\Columns\TextColumn\TextColumnSize::Small),
+                Tables\Columns\TextColumn::make('user.name')->label('Pembeli')
+                    ->description(fn ($record) => $record->user?->email)
+                    ->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('items_summary')
+                    ->label('Event')
+                    ->state(fn ($record) => $record->items->pluck('title')->implode(', '))
+                    ->wrap()
+                    ->size(Tables\Columns\TextColumn\TextColumnSize::Small)
+                    ->color('gray')
+                    ->limit(50)
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('total_amount')->label('Total')
                     ->money('IDR', false)
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('meta_json->payment_type')
-                    ->label('Payment')
+                    ->label('Bayar')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state === 'automatic' ? 'Automatic' : 'Manual')
+                    ->formatStateUsing(fn ($state) => $state === 'automatic' ? 'Otomatis' : 'Manual')
                     ->colors([
                         'warning' => 'manual',
                         'success' => 'automatic',
@@ -44,8 +59,12 @@ class OrderResource extends Resource
                     'danger' => 'failed',
                     'warning' => 'cancelled',
                 ]),
-                Tables\Columns\TextColumn::make('paid_at')->label('Paid At')->dateTime()->toggleable(),
-                Tables\Columns\TextColumn::make('created_at')->label('Created')->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make('paid_at')->label('Dibayar')
+                    ->dateTime('d M Y H:i')
+                    ->toggleable()
+                    ->placeholder('—'),
+                Tables\Columns\TextColumn::make('created_at')->label('Dibuat')
+                    ->dateTime('d M Y H:i')->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')->options([
@@ -54,11 +73,21 @@ class OrderResource extends Resource
                     'failed' => 'Failed',
                     'cancelled' => 'Cancelled',
                 ]),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('from')->label('Dari'),
+                        Forms\Components\DatePicker::make('until')->label('Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['from'], fn (Builder $q, $date) => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['until'], fn (Builder $q, $date) => $q->whereDate('created_at', '<=', $date));
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('reviewManual')
-                    ->label('Review Manual')
+                    ->label('Review')
                     ->icon('heroicon-o-check')
                     ->color('warning')
                     ->visible(fn ($record) => ($record->status === 'pending')
@@ -91,15 +120,12 @@ class OrderResource extends Resource
                         $record->paid_at = now();
                         $record->save();
 
-                        // Issue tickets upon manual approval
                         try { \App\Services\TicketIssuer::issueForOrder($record); } catch (\Throwable $e) { }
 
                         \Filament\Notifications\Notification::make()->title('Order disetujui & tiket diterbitkan')->success()->send();
                     }),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([]),
-            ])
+            ->bulkActions([])
             ->defaultSort('created_at', 'desc');
     }
 
@@ -119,8 +145,15 @@ class OrderResource extends Resource
         ];
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            OrderStatsOverview::class,
+        ];
+    }
+
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['user']);
+        return parent::getEloquentQuery()->with(['user', 'items']);
     }
 }

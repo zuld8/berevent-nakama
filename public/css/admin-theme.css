@@ -55,7 +55,7 @@ body,
 /* Nav items default */
 .fi-sidebar-item a,
 .fi-sidebar-item button {
-    color: #94a3b8 !important;
+    color: #cbd5e1 !important;
     border-radius: 10px !important;
     margin: 1px 8px !important;
     padding: 8px 12px !important;
@@ -64,8 +64,8 @@ body,
 
 .fi-sidebar-item a:hover,
 .fi-sidebar-item button:hover {
-    background: rgba(255, 255, 255, 0.07) !important;
-    color: #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
 }
 
 /* Active nav item */
@@ -86,7 +86,7 @@ body,
 /* Group labels */
 .fi-sidebar-group-label,
 .fi-sidebar-group button span {
-    color: #475569 !important;
+    color: #94a3b8 !important;
     font-size: 0.65rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.08em !important;
@@ -105,13 +105,13 @@ body,
 }
 
 .fi-sidebar-group-button svg {
-    color: #475569 !important;
+    color: #94a3b8 !important;
 }
 
 /* Collapse icon */
 .fi-sidebar-close-btn,
 .fi-icon-btn {
-    color: #64748b !important;
+    color: #94a3b8 !important;
 }
 
 /* Sidebar scrollbar */

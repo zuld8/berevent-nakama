@@ -89,20 +89,69 @@ class OrderResource extends Resource
                         $followups = $meta['followups'] ?? [];
 
                         if (!empty($followups[$key])) {
-                            // Toggle off
+                            // Toggle off (undo)
                             unset($followups[$key]);
-                        } else {
-                            // Toggle on
-                            $followups[$key] = now()->format('d M Y H:i');
+                            $meta['followups'] = $followups;
+                            $record->meta_json = $meta;
+                            $record->save();
+                            \Filament\Notifications\Notification::make()
+                                ->title('Follow-up dibatalkan')
+                                ->warning()->send();
+                            return;
                         }
 
+                        // Get phone number
+                        $phone = $record->user?->phone ?? '';
+                        if (empty($phone)) {
+                            // Try from meta
+                            $phone = data_get($meta, 'buyer_phone', '');
+                        }
+
+                        // Build body params for WABA template
+                        $itemTitle = $record->items->pluck('title')->implode(', ') ?: '-';
+                        $bodyParams = [
+                            $record->user?->name ?? 'Pelanggan',
+                            $record->reference ?? '',
+                            'Rp ' . number_format((float)$record->total_amount, 0, ',', '.'),
+                            $itemTitle,
+                        ];
+
+                        // Attempt to send via WABA
+                        $waba = new \App\Services\WabaService();
+                        $config = $waba->getConfig();
+                        $sent = false;
+                        $error = null;
+
+                        if ($config['enabled'] && !empty($phone)) {
+                            $result = $waba->sendFollowUp($key, $phone, $bodyParams);
+                            $sent = $result['success'];
+                            $error = $result['error'];
+                        }
+
+                        // Mark as sent regardless (manual tracking)
+                        $followups[$key] = now()->format('d M Y H:i');
+                        if ($sent) {
+                            $followups[$key . '_waba'] = true;
+                        }
                         $meta['followups'] = $followups;
                         $record->meta_json = $meta;
                         $record->save();
 
-                        \Filament\Notifications\Notification::make()
-                            ->title($key === 'w' ? 'Welcome message toggled' : 'Follow-up ' . str_replace('fu', '', $key) . ' toggled')
-                            ->success()->send();
+                        $label = $key === 'w' ? 'Welcome' : 'Follow-up ' . str_replace('fu', '', $key);
+                        if ($sent) {
+                            \Filament\Notifications\Notification::make()
+                                ->title("✅ {$label} terkirim via WABA")
+                                ->success()->send();
+                        } elseif (!empty($phone) && $config['enabled']) {
+                            \Filament\Notifications\Notification::make()
+                                ->title("⚠️ {$label} ditandai, tapi WA gagal")
+                                ->body($error)
+                                ->warning()->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title("📌 {$label} ditandai (WA tidak aktif/no HP kosong)")
+                                ->info()->send();
+                        }
                     }),
 
                 // Review Manual Payment

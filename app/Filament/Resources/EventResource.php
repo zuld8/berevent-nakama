@@ -139,6 +139,22 @@ class EventResource extends Resource
                             ->live()
                             ->helperText('Pilih cara pengiriman: teks langsung atau template WABA yang sudah diapprove Meta.'),
 
+                        Forms\Components\Placeholder::make('followup_vars_info')
+                            ->label('📋 Placeholder yang tersedia')
+                            ->content(new \Illuminate\Support\HtmlString(
+                                '<div class="text-xs space-y-1 text-gray-500">' .
+                                '<div class="grid grid-cols-2 gap-x-4 gap-y-0.5">' .
+                                '<div><code class="text-amber-600">{name}</code> — Nama pembeli</div>' .
+                                '<div><code class="text-amber-600">{email}</code> — Email pembeli</div>' .
+                                '<div><code class="text-amber-600">{phone}</code> — No. HP pembeli</div>' .
+                                '<div><code class="text-amber-600">{reference}</code> — Kode referensi order</div>' .
+                                '<div><code class="text-amber-600">{total}</code> — Total bayar (formatted)</div>' .
+                                '<div><code class="text-amber-600">{event_title}</code> — Judul event</div>' .
+                                '<div><code class="text-amber-600">{pay_url}</code> — Link pembayaran</div>' .
+                                '<div><code class="text-amber-600">{organization_name}</code> — Nama organisasi</div>' .
+                                '</div></div>'
+                            )),
+
                         // === TEXT MODE ===
                         Forms\Components\Tabs::make('followup_text_tabs')
                             ->visible(fn (callable $get) => ($get('meta_json.followup_mode') ?? 'text') === 'text')

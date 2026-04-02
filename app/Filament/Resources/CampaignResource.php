@@ -176,6 +176,24 @@ class CampaignResource extends Resource
                             ->live()
                             ->helperText('Pilih cara pengiriman: teks langsung atau template WABA yang sudah diapprove Meta.'),
 
+                        Forms\Components\Placeholder::make('followup_vars_info')
+                            ->label('📋 Placeholder yang tersedia')
+                            ->content(new \Illuminate\Support\HtmlString(
+                                '<div class="text-xs space-y-1 text-gray-500">' .
+                                '<div class="grid grid-cols-2 gap-x-4 gap-y-0.5">' .
+                                '<div><code class="text-amber-600">{donor_name}</code> — Nama donatur</div>' .
+                                '<div><code class="text-amber-600">{donor_email}</code> — Email donatur</div>' .
+                                '<div><code class="text-amber-600">{donor_phone}</code> — No. HP donatur</div>' .
+                                '<div><code class="text-amber-600">{reference}</code> — Kode referensi donasi</div>' .
+                                '<div><code class="text-amber-600">{amount}</code> — Jumlah donasi (formatted)</div>' .
+                                '<div><code class="text-amber-600">{amount_raw}</code> — Jumlah donasi (angka)</div>' .
+                                '<div><code class="text-amber-600">{campaign_title}</code> — Judul campaign</div>' .
+                                '<div><code class="text-amber-600">{campaign_url}</code> — Link campaign</div>' .
+                                '<div><code class="text-amber-600">{pay_url}</code> — Link pembayaran</div>' .
+                                '<div><code class="text-amber-600">{organization_name}</code> — Nama organisasi</div>' .
+                                '</div></div>'
+                            )),
+
                         // === TEXT MODE ===
                         Forms\Components\Tabs::make('followup_text_tabs')
                             ->visible(fn (callable $get) => ($get('settings_json.followup_mode') ?? 'text') === 'text')

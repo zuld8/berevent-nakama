@@ -31,7 +31,7 @@ class HomeController extends Controller
             ->get(['id','event_id','image_path','status','updated_at']);
 
         $events = Event::query()
-            ->with(['category:id,name,slug'])
+            ->with(['category:id,name,slug', 'organization:id,name'])
             ->when($categorySlug, fn ($query) => $query->whereHas('category', fn ($cq) => $cq->where('slug', $categorySlug)))
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($qq) use ($q) {

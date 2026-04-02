@@ -69,6 +69,9 @@
                         <span class="block text-lg font-bold text-gray-900">{{ $priceLabel }}</span>
                     </div>
                 </div>
+                @if ($event->organization)
+                    <p class="mt-1 text-xs text-gray-400">by {{ $event->organization->name }}</p>
+                @endif
 
                 <div class="mt-3 space-y-1 text-[13px] text-gray-600">
                     <div class="flex items-center gap-1.5">

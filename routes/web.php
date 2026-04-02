@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderPaymentController;
@@ -30,6 +31,8 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 Route::get('/program', [ProgramController::class, 'index'])->name('program.index');
 Route::get('/programs/chunk', [ProgramController::class, 'chunk'])->name('program.chunk');
+// Organization public page
+Route::get('/org/{slug}', [OrganizationController::class, 'show'])->name('organization.show');
 // Events
 Route::get('/event', [EventController::class, 'index'])->name('event.index');
 Route::get('/event/{event:slug}', [EventController::class, 'show'])->name('event.show');

@@ -241,7 +241,7 @@
                                     {{ $c->title }}
                                 </h3>
                                 @if ($c->organization)
-                                    <p class="text-xs text-gray-400">by {{ $c->organization->name }}</p>
+                                    <x-org-badge :org="$c->organization" size="xs" />
                                 @endif
                                 @if ($c->summary)
                                     <p class="mt-0.5 text-xs text-gray-500 line-clamp-1">{{ $c->summary }}</p>

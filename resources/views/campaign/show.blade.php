@@ -105,7 +105,7 @@
                             {{ $c->title }}
                         </h1>
                         @if ($c->organization)
-                            <p class="mt-1 text-sm text-white/80">by {{ $c->organization->name }}</p>
+                            <x-org-badge :org="$c->organization" size="md" color="white" />
                         @endif
                         @if ($c->summary)
                             <p class="mt-2 text-sm sm:text-base text-white/90 line-clamp-2 max-w-2xl">{{ $c->summary }}</p>
@@ -119,7 +119,7 @@
                             {{ $c->title }}
                         </h1>
                         @if ($c->organization)
-                            <p class="mt-1 text-sm text-white/80">by {{ $c->organization->name }}</p>
+                            <x-org-badge :org="$c->organization" size="md" color="white" />
                         @endif
                         @if ($c->summary)
                             <p class="mt-2 text-sm sm:text-base text-white/90 line-clamp-2 max-w-2xl">{{ $c->summary }}</p>

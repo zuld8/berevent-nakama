@@ -57,7 +57,7 @@
                 </button>
             </div>
             @if ($event->organization)
-                <p class="text-[11px] text-gray-400">by {{ $event->organization->name }}</p>
+                <x-org-badge :org="$event->organization" size="xs" />
             @endif
 
             <div class="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-gray-600">

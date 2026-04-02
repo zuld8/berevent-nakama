@@ -70,7 +70,7 @@
                     </div>
                 </div>
                 @if ($event->organization)
-                    <p class="mt-1 text-xs text-gray-400">by {{ $event->organization->name }}</p>
+                    <x-org-badge :org="$event->organization" size="sm" />
                 @endif
 
                 <div class="mt-3 space-y-1 text-[13px] text-gray-600">

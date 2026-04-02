@@ -14,7 +14,7 @@
     $c = $colors[$color] ?? $colors['gray'];
 @endphp
 
-<a href="{{ route('organization.show', $org->slug) }}"
+<a href="{{ $org->slug ? route('organization.show', $org->slug) : '#' }}"
    class="inline-flex items-center gap-1.5 {{ $c }} transition-colors z-20 relative">
     @if ($org->logo_url)
         <img src="{{ $org->logo_url }}" alt="{{ $org->name }}"

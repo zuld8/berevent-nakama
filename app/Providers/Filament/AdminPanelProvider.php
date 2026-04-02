@@ -32,13 +32,26 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('Nakama Project Hub')
+            ->favicon(asset('favicon.ico'))
             ->sidebarCollapsibleOnDesktop()
             ->collapsibleNavigationGroups()
             ->sidebarWidth('18rem')
             ->collapsedSidebarWidth('4.25rem')
             ->colors([
-                'primary' => Color::Sky,
+                'primary' => Color::Teal,
+                'danger' => Color::Rose,
+                'info' => Color::Sky,
+                'success' => Color::Emerald,
+                'warning' => Color::Amber,
             ])
+            ->font('Inter')
+            ->maxContentWidth('full')
+            ->renderHook(
+                'panels::styles.after',
+                fn () => new \Illuminate\Support\HtmlString(
+                    '<link rel="stylesheet" href="' . asset('css/admin-theme.css') . '?v=' . filemtime(public_path('css/admin-theme.css')) . '">'
+                )
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -52,7 +65,6 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\LatestOrders::class,
                 Widgets\LatestDonations::class,
             ])
-            // Define nicer grouped navigation and a quick website link
             ->navigationGroups([
                 NavigationGroup::make('Utama')->icon('heroicon-o-home')->collapsed(false),
                 NavigationGroup::make('Events')->icon('heroicon-o-ticket'),
@@ -68,7 +80,7 @@ class AdminPanelProvider extends PanelProvider
                 AuthenticateSession::class,
                 EnsureAdmin::class,
                 ShareErrorsFromSession::class,
-                VerifyCsrfToken::class, // This is correctly placed
+                VerifyCsrfToken::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,

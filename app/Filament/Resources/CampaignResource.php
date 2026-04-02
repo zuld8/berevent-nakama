@@ -161,11 +161,24 @@ class CampaignResource extends Resource
                             ->helperText('Opsional. Default: ringkasan campaign.'),
                     ]),
 
-                Forms\Components\Section::make('📱 Follow-Up Text')
-                    ->description('Atur teks follow-up WhatsApp per campaign. Gunakan placeholder: {donor_name}, {reference}, {amount}, {campaign_title}, {pay_url}')
+                Forms\Components\Section::make('📱 Follow-Up WhatsApp')
+                    ->description('Atur pesan follow-up WhatsApp per campaign.')
                     ->collapsed()
                     ->schema([
-                        Forms\Components\Tabs::make('followup_tabs')
+                        Forms\Components\Select::make('settings_json.followup_mode')
+                            ->label('Mode Pengiriman')
+                            ->options([
+                                'text' => '📝 Teks Biasa (WA Service)',
+                                'waba' => '📲 WABA Template (Replai.id)',
+                            ])
+                            ->default('text')
+                            ->native(false)
+                            ->live()
+                            ->helperText('Pilih cara pengiriman: teks langsung atau template WABA yang sudah diapprove Meta.'),
+
+                        // === TEXT MODE ===
+                        Forms\Components\Tabs::make('followup_text_tabs')
+                            ->visible(fn (callable $get) => ($get('settings_json.followup_mode') ?? 'text') === 'text')
                             ->tabs([
                                 Forms\Components\Tabs\Tab::make('🟢 Welcome')
                                     ->schema([
@@ -173,35 +186,74 @@ class CampaignResource extends Resource
                                             ->label('Pesan Welcome')
                                             ->rows(6)
                                             ->placeholder("Assalamu'alaikum {donor_name},\n\nTerima kasih atas niat baik Anda berdonasi di {campaign_title}.\nRef: {reference}\nNominal: {amount}\n\nSilakan selesaikan pembayaran:\n{pay_url}")
-                                            ->helperText('Dikirim saat donasi baru dibuat.'),
+                                            ->helperText('Placeholder: {donor_name}, {reference}, {amount}, {campaign_title}, {pay_url}'),
                                     ]),
                                 Forms\Components\Tabs\Tab::make('🟡 Follow Up 1')
                                     ->schema([
                                         Forms\Components\Textarea::make('settings_json.followup_text.fu1')
-                                            ->label('Follow Up 1')
-                                            ->rows(6)
-                                            ->placeholder("Halo {donor_name},\n\nPembayaran donasi untuk {campaign_title} belum kami terima.\nRef: {reference} | Nominal: {amount}\n\nYuk segera selesaikan:\n{pay_url}"),
+                                            ->label('Follow Up 1')->rows(6),
                                     ]),
                                 Forms\Components\Tabs\Tab::make('🟡 Follow Up 2')
                                     ->schema([
                                         Forms\Components\Textarea::make('settings_json.followup_text.fu2')
-                                            ->label('Follow Up 2')
-                                            ->rows(6)
-                                            ->placeholder("Hai {donor_name},\n\nJangan lewatkan kesempatan berdonasi di {campaign_title}.\nSegera selesaikan pembayaran:\n{pay_url}"),
+                                            ->label('Follow Up 2')->rows(6),
                                     ]),
                                 Forms\Components\Tabs\Tab::make('🟡 Follow Up 3')
                                     ->schema([
                                         Forms\Components\Textarea::make('settings_json.followup_text.fu3')
-                                            ->label('Follow Up 3')
-                                            ->rows(6)
-                                            ->placeholder("Terakhir kami ingatkan {donor_name},\n\nDonasi Anda untuk {campaign_title} masih menunggu pembayaran.\n{pay_url}"),
+                                            ->label('Follow Up 3')->rows(6),
                                     ]),
                                 Forms\Components\Tabs\Tab::make('✅ Paid')
                                     ->schema([
                                         Forms\Components\Textarea::make('settings_json.followup_text.paid')
-                                            ->label('Konfirmasi Bayar')
-                                            ->rows(6)
-                                            ->placeholder("Alhamdulillah {donor_name}! 🙏\n\nDonasi Anda untuk {campaign_title} sebesar {amount} berhasil diterima.\nRef: {reference}\n\nSemoga menjadi amal jariyah."),
+                                            ->label('Konfirmasi Bayar')->rows(6),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+
+                        // === WABA MODE ===
+                        Forms\Components\Tabs::make('followup_waba_tabs')
+                            ->visible(fn (callable $get) => ($get('settings_json.followup_mode') ?? 'text') === 'waba')
+                            ->tabs([
+                                Forms\Components\Tabs\Tab::make('🟢 Welcome')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('settings_json.followup_waba.welcome_template_id')
+                                            ->label('Template ID')
+                                            ->placeholder('welcome_donation_123')
+                                            ->helperText('Template ID yang sudah diapprove di Meta Business Suite.'),
+                                        Forms\Components\Textarea::make('settings_json.followup_waba.welcome_body')
+                                            ->label('Body Parameters (1 per baris)')
+                                            ->rows(4)
+                                            ->placeholder("{donor_name}\n{campaign_title}\n{amount}\n{pay_url}")
+                                            ->helperText('Setiap baris = 1 body parameter. Gunakan placeholder.'),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 1')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('settings_json.followup_waba.fu1_template_id')
+                                            ->label('Template ID'),
+                                        Forms\Components\Textarea::make('settings_json.followup_waba.fu1_body')
+                                            ->label('Body Parameters (1 per baris)')->rows(4),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 2')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('settings_json.followup_waba.fu2_template_id')
+                                            ->label('Template ID'),
+                                        Forms\Components\Textarea::make('settings_json.followup_waba.fu2_body')
+                                            ->label('Body Parameters (1 per baris)')->rows(4),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('🟡 Follow Up 3')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('settings_json.followup_waba.fu3_template_id')
+                                            ->label('Template ID'),
+                                        Forms\Components\Textarea::make('settings_json.followup_waba.fu3_body')
+                                            ->label('Body Parameters (1 per baris)')->rows(4),
+                                    ]),
+                                Forms\Components\Tabs\Tab::make('✅ Paid')
+                                    ->schema([
+                                        Forms\Components\TextInput::make('settings_json.followup_waba.paid_template_id')
+                                            ->label('Template ID'),
+                                        Forms\Components\Textarea::make('settings_json.followup_waba.paid_body')
+                                            ->label('Body Parameters (1 per baris)')->rows(4),
                                     ]),
                             ])
                             ->columnSpanFull(),

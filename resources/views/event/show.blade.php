@@ -18,13 +18,10 @@
             $sameYear = $start->format('Y') === $end->format('Y');
             $sameMonth = $start->format('mY') === $end->format('mY');
             if ($sameMonth && $sameYear) {
-                // Example: 05 – 12 Jun 2025
                 $dateText = $start->translatedFormat('d') . ' – ' . $end->translatedFormat('d M Y');
             } elseif ($sameYear) {
-                // Example: 28 May – 03 Jun 2025
                 $dateText = $start->translatedFormat('d M') . ' – ' . $end->translatedFormat('d M Y');
             } else {
-                // Example: 28 Dec 2025 – 03 Jan 2026
                 $dateText = $start->translatedFormat('d M Y') . ' – ' . $end->translatedFormat('d M Y');
             }
         } elseif ($start) {
@@ -39,6 +36,8 @@
         } elseif (($event->price_type ?? 'fixed') !== 'fixed') {
             $priceLabel = 'Donasi';
         }
+        // Check if event has expired
+        $isExpired = $end && $end->endOfDay()->isPast();
     @endphp
 
     <main class="mx-auto max-w-2xl pb-24">
@@ -191,18 +190,24 @@
     <div class="fixed inset-x-0 bottom-0 z-50">
         <div class="mx-auto max-w-2xl bg-white/95 backdrop-blur border-t border-gray-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] px-4 py-3"
              style="padding-bottom: calc(env(safe-area-inset-bottom,0px) + 12px);">
-            @guest
-                <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Daftar Sekarang</a>
+            @if ($isExpired)
+                <button disabled class="inline-flex w-full items-center justify-center rounded-xl bg-gray-400 px-4 py-3 text-sm font-medium text-white cursor-not-allowed">
+                    ⛔ Event Sudah Berakhir
+                </button>
             @else
-                @if (($event->price_type ?? 'fixed') === 'fixed')
-                    <form method="post" action="{{ route('cart.add', $event->slug) }}">
-                        @csrf
-                        <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Tambahkan Ke Keranjang</button>
-                    </form>
+                @guest
+                    <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Daftar Sekarang</a>
                 @else
-                    <button type="button" onclick="openModal()" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Tambahkan Ke Keranjang</button>
-                @endif
-            @endguest
+                    @if (($event->price_type ?? 'fixed') === 'fixed')
+                        <form method="post" action="{{ route('cart.add', $event->slug) }}">
+                            @csrf
+                            <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Tambahkan Ke Keranjang</button>
+                        </form>
+                    @else
+                        <button type="button" onclick="openModal()" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Tambahkan Ke Keranjang</button>
+                    @endif
+                @endguest
+            @endif
         </div>
     </div>
 

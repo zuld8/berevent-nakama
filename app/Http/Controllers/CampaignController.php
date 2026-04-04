@@ -20,6 +20,14 @@ class CampaignController extends Controller
             ->where('slug', $slug)
             ->firstOrFail();
 
+        // Block if campaign expired or target reached
+        $expired = $campaign->end_date && \Illuminate\Support\Carbon::parse($campaign->end_date)->endOfDay()->isPast();
+        $targetReached = (float) $campaign->target_amount > 0 && (float) $campaign->raised_amount >= (float) $campaign->target_amount;
+        if ($expired || $targetReached) {
+            return redirect()->route('campaign.show', $campaign->slug)
+                ->with('error', $targetReached ? 'Target donasi sudah tercapai.' : 'Campaign ini sudah berakhir.');
+        }
+
         $waCfg = (new WaService())->getConfig();
         $waValidationEnabled = (bool)($waCfg['validate_enabled'] ?? false) && !empty($waCfg['validate_client_id']);
 
@@ -93,6 +101,14 @@ class CampaignController extends Controller
     public function donate(Request $request, string $slug)
     {
         $campaign = Campaign::query()->where('slug', $slug)->firstOrFail();
+
+        // Block if campaign expired or target reached
+        $expired = $campaign->end_date && \Illuminate\Support\Carbon::parse($campaign->end_date)->endOfDay()->isPast();
+        $targetReached = (float) $campaign->target_amount > 0 && (float) $campaign->raised_amount >= (float) $campaign->target_amount;
+        if ($expired || $targetReached) {
+            return redirect()->route('campaign.show', $campaign->slug)
+                ->with('error', $targetReached ? 'Target donasi sudah tercapai.' : 'Campaign ini sudah berakhir.');
+        }
 
         // Prepare allowed midtrans method codes for validation
         $allowedMethodIds = (new PaymentMethodCatalog())->activeMidtrans();

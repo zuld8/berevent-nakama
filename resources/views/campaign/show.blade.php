@@ -92,6 +92,10 @@
                 $progress = (float) $c->target_amount > 0 ? min(100, round(((float) $c->raised_amount / (float) $c->target_amount) * 100)) : 0;
                 $donorCount = \App\Models\Donation::where('campaign_id', $c->id)->where('status', 'paid')->count();
                 $daysLeft = $c->end_date ? max(0, (int) now()->diffInDays($c->end_date, false)) : null;
+                // Check if campaign has expired or target reached
+                $campaignExpired = $c->end_date && \Illuminate\Support\Carbon::parse($c->end_date)->endOfDay()->isPast();
+                $targetReached = (float) $c->target_amount > 0 && (float) $c->raised_amount >= (float) $c->target_amount;
+                $campaignClosed = $campaignExpired || $targetReached;
             @endphp
 
             {{-- Hero Banner --}}
@@ -165,10 +169,22 @@
 
                 {{-- CTA Button --}}
                 <div class="mt-5">
-                    <a href="{{ route('campaign.donate.form', $c->slug) }}"
-                       class="block w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3.5 text-center text-base font-bold text-white shadow-md hover:from-amber-600 hover:to-orange-600 hover:shadow-lg transition-all duration-200">
-                        ❤️ Donasi Sekarang
-                    </a>
+                    @if ($campaignClosed)
+                        @if ($targetReached)
+                            <button disabled class="block w-full rounded-xl bg-emerald-100 px-6 py-3.5 text-center text-base font-bold text-emerald-700 cursor-not-allowed">
+                                ✅ Target Tercapai — Terima Kasih!
+                            </button>
+                        @else
+                            <button disabled class="block w-full rounded-xl bg-gray-200 px-6 py-3.5 text-center text-base font-bold text-gray-500 cursor-not-allowed">
+                                ⛔ Campaign Sudah Berakhir
+                            </button>
+                        @endif
+                    @else
+                        <a href="{{ route('campaign.donate.form', $c->slug) }}"
+                           class="block w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3.5 text-center text-base font-bold text-white shadow-md hover:from-amber-600 hover:to-orange-600 hover:shadow-lg transition-all duration-200">
+                            ❤️ Donasi Sekarang
+                        </a>
+                    @endif
                 </div>
             </div>
 

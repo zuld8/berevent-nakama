@@ -32,6 +32,11 @@ class CartController extends Controller
 
     public function add(Request $request, Event $event)
     {
+        // Block if event has expired
+        if ($event->end_date && \Illuminate\Support\Carbon::parse($event->end_date)->endOfDay()->isPast()) {
+            return redirect()->back()->with('error', 'Event ini sudah berakhir dan tidak bisa dipesan.');
+        }
+
         $items = $this->getItems($request);
         $key = (string) $event->slug;
         $unitPrice = 0.0;

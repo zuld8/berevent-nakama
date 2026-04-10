@@ -59,6 +59,7 @@ Route::middleware('auth')->group(function(){
     Route::get('/ticket/{code}/qr', [TicketController::class, 'qr'])->name('ticket.qr');
 
     // Replay purchase
+    Route::get('/event/{event:slug}/beli-replay', [EventController::class, 'replayCheckout'])->name('event.replay.checkout');
     Route::post('/event/{event:slug}/beli-replay', [EventController::class, 'buyReplay'])->name('event.replay.buy');
 });
 

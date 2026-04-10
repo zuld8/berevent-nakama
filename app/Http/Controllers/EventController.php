@@ -113,35 +113,66 @@ class EventController extends Controller
         ]);
     }
 
-    public function buyReplay(Request $request, Event $event)
+    public function replayCheckout(Event $event)
     {
         $userId = auth()->id();
 
-        // Validasi: event harus punya replay dan dijual
         if (! $event->hasReplay()) {
             return back()->with('error', 'Event ini tidak memiliki rekaman.');
         }
-
         $price = $event->replayPriceForSale();
         if ($price === null) {
             return back()->with('error', 'Rekaman event ini tidak dijual secara publik.');
         }
-
-        // Kalau sudah punya tiket → gratis, redirect ke event show
         if ($event->userHasTicket($userId) || $event->userHasBoughtReplay($userId)) {
             return redirect()->route('event.show', $event->slug)
                 ->with('success', 'Anda sudah memiliki akses ke rekaman ini.');
         }
 
-        // Buat order baru
-        $ref = 'RPL-' . strtoupper(Str::random(8)) . '-' . now()->format('ymd');
+        $catalog  = new \App\Services\Payments\PaymentMethodCatalog();
+        $methods  = $catalog->activeMidtrans();
 
+        return view('order.replay-checkout', [
+            'event'       => $event,
+            'replayPrice' => $price,
+            'methods'     => $methods,
+            'catalog'     => $catalog,
+        ]);
+    }
+
+    public function buyReplay(Request $request, Event $event)
+    {
+        $userId = auth()->id();
+
+        if (! $event->hasReplay()) {
+            return back()->with('error', 'Event ini tidak memiliki rekaman.');
+        }
+        $price = $event->replayPriceForSale();
+        if ($price === null) {
+            return back()->with('error', 'Rekaman event ini tidak dijual secara publik.');
+        }
+        if ($event->userHasTicket($userId) || $event->userHasBoughtReplay($userId)) {
+            return redirect()->route('event.show', $event->slug)
+                ->with('success', 'Anda sudah memiliki akses ke rekaman ini.');
+        }
+
+        $payMethod    = $request->input('pay_method', 'manual');
+        $chosenMethod = (string) $request->input('payment_method', '');
+
+        // Buat order
+        $ref = 'RPL-' . strtoupper(Str::random(8)) . '-' . now()->format('ymd');
         $order = Order::create([
             'user_id'      => $userId,
             'reference'    => $ref,
             'total_amount' => $price,
             'status'       => 'pending',
-            'meta_json'    => ['type' => 'replay', 'event_id' => $event->id],
+            'meta_json'    => [
+                'type'         => 'replay',
+                'event_id'     => $event->id,
+                'payment_type' => $payMethod,
+                'midtrans'     => ($payMethod === 'automatic' && $chosenMethod !== '')
+                    ? ['chosen_method' => $chosenMethod] : null,
+            ],
         ]);
 
         OrderItem::create([
@@ -152,15 +183,56 @@ class EventController extends Controller
             'qty'        => 1,
         ]);
 
-        // Kalau gratis (price = 0), langsung mark paid
+        // Gratis langsung paid
         if ($price === 0) {
-            $order->status = 'paid';
+            $order->status  = 'paid';
             $order->paid_at = now();
             $order->save();
             return redirect()->route('event.show', $event->slug)
                 ->with('success', 'Akses rekaman berhasil diaktifkan!');
         }
 
-        return redirect()->route('order.pay', $ref);
+        // Automatic (Midtrans)
+        if ($payMethod === 'automatic' && $chosenMethod !== '') {
+            $catalog  = new \App\Services\Payments\PaymentMethodCatalog();
+            $feeInfo  = $catalog->computeFee((float) $order->total_amount, $chosenMethod);
+            $base     = max(1, (int) round((float) $order->total_amount));
+            $fee      = max(0, (int) round((float) ($feeInfo['amount'] ?? 0)));
+            $gross    = $base + $fee;
+
+            $items = [[
+                'id'       => 'replay_' . $event->id,
+                'price'    => $base,
+                'quantity' => 1,
+                'name'     => Str::limit('[Replay] ' . $event->title, 50, ''),
+            ]];
+            if ($fee > 0) {
+                $items[] = ['id' => 'admin_fee', 'price' => $fee, 'quantity' => 1, 'name' => 'Biaya Admin'];
+            }
+
+            $mid = new \App\Services\Payments\MidtransService();
+            $res = $mid->createSnapTransactionForOrder($order, [
+                'enabled_payments' => match($chosenMethod) { 'qris' => ['gopay'], default => [$chosenMethod] },
+                'override_gross'   => $gross,
+                'item_details'     => $items,
+            ]);
+
+            $meta = $order->meta_json ?? [];
+            $meta['midtrans'] = ($meta['midtrans'] ?? []) + [
+                'chosen_method' => $chosenMethod,
+                'snap_token'    => $res['token'] ?? null,
+                'redirect_url'  => $res['redirect_url'] ?? null,
+            ];
+            $order->meta_json = $meta;
+            $order->save();
+
+            if (!empty($res['redirect_url'])) {
+                return redirect()->away($res['redirect_url']);
+            }
+            return redirect()->route('order.pay', $order->reference);
+        }
+
+        // Manual transfer
+        return redirect()->route('order.manual', $order->reference);
     }
 }

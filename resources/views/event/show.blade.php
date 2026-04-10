@@ -263,18 +263,15 @@
                             🔐 Login untuk Beli Rekaman
                         </a>
                     @else
-                        <form method="POST" action="{{ route('event.replay.buy', $event->slug) }}">
-                            @csrf
-                            <button type="submit"
-                                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
-                                🎬 Beli Rekaman
-                                @if ($replayPrice > 0)
-                                    — Rp {{ number_format($replayPrice, 0, ',', '.') }}
-                                @else
-                                    (Gratis)
-                                @endif
-                            </button>
-                        </form>
+                        <a href="{{ route('event.replay.checkout', $event->slug) }}"
+                           class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
+                            🎬 Beli Rekaman
+                            @if ($replayPrice > 0)
+                                — Rp {{ number_format($replayPrice, 0, ',', '.') }}
+                            @else
+                                (Gratis)
+                            @endif
+                        </a>
                     @endguest
 
                 @else

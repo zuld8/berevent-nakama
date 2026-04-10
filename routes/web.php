@@ -124,3 +124,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
+
+// Protected API: replay embed URL (auth + rate limit 10/min)
+Route::middleware(['auth', 'throttle:10,1'])->group(function () {
+    Route::get('/api/event/{event:slug}/replay-url', [EventController::class, 'replayEmbedUrl'])
+        ->name('api.event.replay-url');
+});

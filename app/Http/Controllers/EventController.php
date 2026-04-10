@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Organization;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -234,5 +235,57 @@ class EventController extends Controller
 
         // Manual transfer
         return redirect()->route('order.manual', $order->reference);
+    }
+
+    /**
+     * API: return YouTube embed URL hanya kalau user punya akses.
+     * Video ID TIDAK pernah ada di HTML — hanya dikirim via JSON setelah validasi.
+     */
+    public function replayEmbedUrl(Event $event): JsonResponse
+    {
+        $userId = auth()->id();
+
+        // Harus ada replay
+        if (! $event->hasReplay()) {
+            return response()->json(['error' => 'Rekaman tidak tersedia.'], 403);
+        }
+
+        // Validasi akses: punya tiket ATAU sudah beli replay
+        $canWatch = $event->userCanWatchFree($userId) || $event->userHasBoughtReplay($userId);
+        if (! $canWatch) {
+            return response()->json(['error' => 'Akses ditolak.'], 403);
+        }
+
+        // Ekstrak YouTube ID di server
+        $replayRaw = (string) $event->replay_url;
+        $ytId = null;
+        if (preg_match(
+            '/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/',
+            $replayRaw, $m
+        )) {
+            $ytId = $m[1];
+        }
+
+        if ($ytId) {
+            // Bangun embed URL di server dengan origin lock
+            $origin = config('app.url', 'https://nakamaproject.id');
+            $embedUrl = 'https://www.youtube-nocookie.com/embed/' . $ytId
+                . '?autoplay=1&modestbranding=1&rel=0&showinfo=0'
+                . '&iv_load_policy=3&playsinline=1&color=white'
+                . '&origin=' . urlencode($origin);
+
+            return response()->json([
+                'type'      => 'youtube',
+                'embed_url' => $embedUrl,
+                // token 1x pakai (opsional, bisa dikembangkan)
+                'expires'   => now()->addHours(6)->timestamp,
+            ]);
+        }
+
+        // Fallback: bukan YouTube, return URL langsung
+        return response()->json([
+            'type'      => 'direct',
+            'embed_url' => $replayRaw,
+        ]);
     }
 }

@@ -141,46 +141,118 @@
                 {{-- Replay Video Section (hanya tampil kalau event selesai + punya akses) --}}
                 @if ($isExpired && $event->hasReplay() && $canWatch)
                     @php
-                        // Extract YouTube video ID dari URL
                         $replayYtId = null;
                         $replayRaw  = (string) $event->replay_url;
                         if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/', $replayRaw, $ym)) {
                             $replayYtId = $ym[1];
                         }
+                        // YouTube thumbnail (hqdefault = 480x360, maxresdefault = 1280x720)
+                        $thumbUrl = $replayYtId
+                            ? "https://i.ytimg.com/vi/{$replayYtId}/hqdefault.jpg"
+                            : null;
                     @endphp
                     <div class="mt-6 rounded-2xl overflow-hidden bg-gray-900 shadow-lg">
+                        {{-- Header --}}
                         <div class="flex items-center gap-2 px-4 py-2.5 bg-gray-800">
-                            <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                            <span class="text-xs font-semibold text-gray-300 uppercase tracking-wide">🎬 Rekaman Event</span>
+                            <span class="h-2 w-2 rounded-full bg-sky-400 animate-pulse"></span>
+                            <span class="text-xs font-semibold text-white uppercase tracking-wider">🎬 Rekaman Event</span>
+                            <span class="ml-auto text-[10px] text-gray-500">Nakama Project Hub</span>
                         </div>
+
                         @if ($replayYtId)
-                            <div class="relative w-full" style="aspect-ratio:16/9;">
-                                <iframe
-                                    src="https://www.youtube.com/embed/{{ $replayYtId }}?modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&color=white"
-                                    class="absolute inset-0 w-full h-full"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen
-                                    title="{{ $event->title }} - Rekaman">
-                                </iframe>
+                            {{-- FACADE: tampil thumbnail dulu, load iframe pas diklik --}}
+                            <div id="replay-facade"
+                                 class="relative w-full cursor-pointer group"
+                                 style="aspect-ratio:16/9;background:#000;"
+                                 onclick="loadReplayPlayer('{{ $replayYtId }}')">
+
+                                {{-- Thumbnail --}}
+                                @if($thumbUrl)
+                                    <img src="{{ $thumbUrl }}"
+                                         alt="Rekaman {{ $event->title }}"
+                                         class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity duration-200"/>
+                                @else
+                                    <div class="absolute inset-0 bg-gray-800"></div>
+                                @endif
+
+                                {{-- Overlay gelap --}}
+                                <div class="absolute inset-0 bg-black/30"></div>
+
+                                {{-- Judul Event --}}
+                                <div class="absolute top-3 left-3 right-3">
+                                    <div class="text-white text-sm font-semibold drop-shadow line-clamp-2">
+                                        {{ $event->title }}
+                                    </div>
+                                </div>
+
+                                {{-- Custom Play Button (branded, bukan YouTube) --}}
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="flex flex-col items-center gap-2">
+                                        <div class="flex items-center justify-center w-16 h-16 rounded-full bg-sky-500 shadow-2xl group-hover:bg-sky-400 group-hover:scale-110 transition-all duration-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-7 h-7 ml-1">
+                                                <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                        <span class="text-white text-xs font-medium bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">
+                                            Tap untuk Putar
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {{-- Badge eksklusif --}}
+                                <div class="absolute bottom-3 right-3">
+                                    <span class="text-[10px] font-semibold text-white bg-sky-600/80 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                                        🔒 Eksklusif
+                                    </span>
+                                </div>
                             </div>
+
+                            {{-- Placeholder untuk iframe setelah diklik --}}
+                            <div id="replay-player" class="hidden relative w-full" style="aspect-ratio:16/9;"></div>
+
                         @else
-                            {{-- Fallback: URL langsung (bukan YouTube) --}}
-                            <div class="p-4">
+                            {{-- Fallback: bukan YouTube --}}
+                            <div class="p-5">
                                 <a href="{{ $event->replay_url }}" target="_blank" rel="noopener"
-                                   class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-sky-700">
+                                   class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-sky-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                                        <path d="M8 5.25a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-1.5 0V6h-9.75A.75.75 0 0 1 8 5.25z"/>
-                                        <path d="M3.75 9a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5H5.56l8.47 8.47a.75.75 0 1 1-1.06 1.06L4.5 10.81v2.94a.75.75 0 0 1-1.5 0V9z"/>
+                                        <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd"/>
                                     </svg>
                                     Tonton Rekaman
                                 </a>
                             </div>
                         @endif
-                        <div class="px-4 py-2 bg-gray-800 text-[11px] text-gray-500 text-center">
-                            Akses eksklusif untuk peserta & pembeli rekaman
+
+                        <div class="px-4 py-2 bg-gray-800 text-[11px] text-gray-400 text-center">
+                            Akses eksklusif · Nakama Project Hub
                         </div>
                     </div>
+
+                    <script>
+                    function loadReplayPlayer(ytId) {
+                        var facade = document.getElementById('replay-facade');
+                        var player = document.getElementById('replay-player');
+                        if (!facade || !player) return;
+
+                        // Sembunyikan facade, tampilkan player
+                        facade.classList.add('hidden');
+                        player.classList.remove('hidden');
+
+                        // Buat iframe dengan parameter no-branding + autoplay
+                        var iframe = document.createElement('iframe');
+                        iframe.src = 'https://www.youtube-nocookie.com/embed/' + ytId
+                            + '?autoplay=1&modestbranding=1&rel=0&showinfo=0'
+                            + '&iv_load_policy=3&playsinline=1&color=white&origin=' + encodeURIComponent(window.location.origin);
+                        iframe.className = 'absolute inset-0 w-full h-full';
+                        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
+                        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+                        iframe.allowFullscreen = true;
+                        iframe.title = 'Rekaman Event';
+
+                        player.style.position = 'relative';
+                        player.appendChild(iframe);
+                    }
+                    </script>
                 @endif
 
                 {{-- CTA moved to fixed bottom bar --}}

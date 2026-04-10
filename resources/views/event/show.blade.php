@@ -138,12 +138,58 @@
                     </div>
                 @endif
 
+                {{-- Replay Video Section (hanya tampil kalau event selesai + punya akses) --}}
+                @if ($isExpired && $event->hasReplay() && $canWatch)
+                    @php
+                        // Extract YouTube video ID dari URL
+                        $replayYtId = null;
+                        $replayRaw  = (string) $event->replay_url;
+                        if (preg_match('/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/', $replayRaw, $ym)) {
+                            $replayYtId = $ym[1];
+                        }
+                    @endphp
+                    <div class="mt-6 rounded-2xl overflow-hidden bg-gray-900 shadow-lg">
+                        <div class="flex items-center gap-2 px-4 py-2.5 bg-gray-800">
+                            <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span class="text-xs font-semibold text-gray-300 uppercase tracking-wide">🎬 Rekaman Event</span>
+                        </div>
+                        @if ($replayYtId)
+                            <div class="relative w-full" style="aspect-ratio:16/9;">
+                                <iframe
+                                    src="https://www.youtube.com/embed/{{ $replayYtId }}?modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&color=white"
+                                    class="absolute inset-0 w-full h-full"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                    title="{{ $event->title }} - Rekaman">
+                                </iframe>
+                            </div>
+                        @else
+                            {{-- Fallback: URL langsung (bukan YouTube) --}}
+                            <div class="p-4">
+                                <a href="{{ $event->replay_url }}" target="_blank" rel="noopener"
+                                   class="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-sky-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
+                                        <path d="M8 5.25a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-1.5 0V6h-9.75A.75.75 0 0 1 8 5.25z"/>
+                                        <path d="M3.75 9a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5H5.56l8.47 8.47a.75.75 0 1 1-1.06 1.06L4.5 10.81v2.94a.75.75 0 0 1-1.5 0V9z"/>
+                                    </svg>
+                                    Tonton Rekaman
+                                </a>
+                            </div>
+                        @endif
+                        <div class="px-4 py-2 bg-gray-800 text-[11px] text-gray-500 text-center">
+                            Akses eksklusif untuk peserta & pembeli rekaman
+                        </div>
+                    </div>
+                @endif
+
                 {{-- CTA moved to fixed bottom bar --}}
             </div>
         </div>
     </main>
-    <!-- Price Selection Modal for Dynamic Pricing -->
-    @if (($event->price_type ?? 'fixed') !== 'fixed')
+
+    {{-- Price Selection Modal for Dynamic Pricing --}}
+    @if (($event->price_type ?? 'fixed') !== 'fixed' && !$isExpired)
         <div id="priceModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
             <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                 <h3 class="text-lg font-semibold text-gray-900">Pilih Nominal Donasi</h3>
@@ -186,15 +232,59 @@
         </div>
     @endif
 
-    <!-- Fixed bottom CTA (replaces bottom navigation) -->
+    {{-- Fixed bottom CTA --}}
     <div class="fixed inset-x-0 bottom-0 z-50">
         <div class="mx-auto max-w-2xl bg-white/95 backdrop-blur border-t border-gray-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] px-4 py-3"
              style="padding-bottom: calc(env(safe-area-inset-bottom,0px) + 12px);">
+
+            @if (session('success'))
+                <div class="mb-2 rounded-xl bg-green-50 border border-green-200 px-3 py-2 text-xs text-green-700 text-center font-medium">
+                    ✅ {{ session('success') }}
+                </div>
+            @endif
+
             @if ($isExpired)
-                <button disabled class="inline-flex w-full items-center justify-center rounded-xl bg-gray-400 px-4 py-3 text-sm font-medium text-white cursor-not-allowed">
-                    ⛔ Event Sudah Berakhir
-                </button>
+                {{-- Event sudah berakhir --}}
+                @if ($event->hasReplay() && $canWatch)
+                    {{-- Already has access — scroll ke video --}}
+                    <button onclick="document.querySelector('.bg-gray-900')?.scrollIntoView({behavior:'smooth'})"
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
+                            <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd"/>
+                        </svg>
+                        Tonton Rekaman
+                    </button>
+
+                @elseif ($event->hasReplay() && $replayPrice !== null)
+                    {{-- Replay tersedia untuk dibeli --}}
+                    @guest
+                        <a href="{{ route('login') }}"
+                           class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
+                            🔐 Login untuk Beli Rekaman
+                        </a>
+                    @else
+                        <form method="POST" action="{{ route('event.replay.buy', $event->slug) }}">
+                            @csrf
+                            <button type="submit"
+                                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
+                                🎬 Beli Rekaman
+                                @if ($replayPrice > 0)
+                                    — Rp {{ number_format($replayPrice, 0, ',', '.') }}
+                                @else
+                                    (Gratis)
+                                @endif
+                            </button>
+                        </form>
+                    @endguest
+
+                @else
+                    <button disabled class="inline-flex w-full items-center justify-center rounded-xl bg-gray-400 px-4 py-3 text-sm font-medium text-white cursor-not-allowed">
+                        ⛔ Event Sudah Berakhir
+                    </button>
+                @endif
+
             @else
+                {{-- Event masih aktif --}}
                 @guest
                     <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Daftar Sekarang</a>
                 @else

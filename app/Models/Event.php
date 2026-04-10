@@ -26,6 +26,8 @@ class Event extends Model
         'description',
         'status',
         'meta_json',
+        'replay_url',
+        'replay_price',
     ];
 
     protected $casts = [
@@ -105,5 +107,51 @@ class Event extends Model
     public function attendances()
     {
         return $this->hasMany(\App\Models\Attendance::class);
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(\App\Models\Ticket::class);
+    }
+
+    /** Apakah event ini punya rekaman? */
+    public function hasReplay(): bool
+    {
+        return ! empty($this->replay_url);
+    }
+
+    /** Apakah user (berdasarkan user_id) punya tiket untuk event ini? */
+    public function userHasTicket(?int $userId): bool
+    {
+        if (! $userId) return false;
+        return \App\Models\Ticket::query()
+            ->where('event_id', $this->id)
+            ->whereHas('order', fn ($q) => $q->where('user_id', $userId)->where('status', 'paid'))
+            ->exists();
+    }
+
+    /** Apakah user bisa langsung tonton replay (gratis karena punya tiket)? */
+    public function userCanWatchFree(?int $userId): bool
+    {
+        return $this->hasReplay() && $this->userHasTicket($userId);
+    }
+
+    /** Harga replay yang harus dibayar (null = tidak dijual) */
+    public function replayPriceForSale(): ?int
+    {
+        if (! $this->hasReplay()) return null;
+        if ($this->replay_price === null) return null; // hanya untuk pemilik tiket
+        return (int) $this->replay_price;
+    }
+
+    /** Apakah user sudah beli replay (via order dengan item replay)? */
+    public function userHasBoughtReplay(?int $userId): bool
+    {
+        if (! $userId) return false;
+        return \App\Models\Order::query()
+            ->where('user_id', $userId)
+            ->where('status', 'paid')
+            ->whereHas('items', fn ($q) => $q->where('event_id', $this->id)->where('title', 'LIKE', '%[Replay]%'))
+            ->exists();
     }
 }

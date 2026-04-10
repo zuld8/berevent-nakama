@@ -237,8 +237,28 @@ class EventResource extends Resource
                             ])
                             ->columnSpanFull(),
                     ])->columnSpanFull(),
+
+                Forms\Components\Section::make('🎬 Rekaman Event')
+                    ->description('Isi URL rekaman setelah event selesai. Peserta (pemilik tiket) langsung bisa nonton gratis selamanya.')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\TextInput::make('replay_url')
+                            ->label('URL Rekaman (YouTube / Link Lain)')
+                            ->placeholder('https://www.youtube.com/watch?v=xxxxx')
+                            ->url()
+                            ->columnSpanFull()
+                            ->helperText('Tempel link YouTube unlisted. Player embed otomatis muncul di halaman event untuk user yang punya akses.'),
+
+                        Forms\Components\TextInput::make('replay_price')
+                            ->label('Harga Rekaman untuk Non-Peserta (IDR)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->placeholder('Contoh: 50000')
+                            ->helperText('Kosongkan = hanya peserta bisa nonton. Isi 0 = gratis untuk semua. Isi angka = harga beli replay.'),
+                    ])->columns(1)->columnSpanFull(),
             ]);
     }
+
 
     public static function table(Table $table): Table
     {

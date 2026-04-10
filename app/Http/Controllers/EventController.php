@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -94,9 +97,70 @@ class EventController extends Controller
             'materials.mentor:id,name,profession,photo_path',
         ]);
 
+        $userId = auth()->id();
+
+        // Replay state
+        $canWatchFree    = $event->userCanWatchFree($userId);      // punya tiket → nonton gratis
+        $hasBoughtReplay = $event->userHasBoughtReplay($userId);   // udah beli replay
+        $canWatch        = $canWatchFree || $hasBoughtReplay;
+        $replayPrice     = $event->replayPriceForSale();            // null = ga dijual
+
         return view('event.show', [
-            'event' => $event,
-            'org' => $org,
+            'event'          => $event,
+            'org'            => $org,
+            'canWatch'       => $canWatch,
+            'replayPrice'    => $replayPrice,
         ]);
+    }
+
+    public function buyReplay(Request $request, Event $event)
+    {
+        $userId = auth()->id();
+
+        // Validasi: event harus punya replay dan dijual
+        if (! $event->hasReplay()) {
+            return back()->with('error', 'Event ini tidak memiliki rekaman.');
+        }
+
+        $price = $event->replayPriceForSale();
+        if ($price === null) {
+            return back()->with('error', 'Rekaman event ini tidak dijual secara publik.');
+        }
+
+        // Kalau sudah punya tiket → gratis, redirect ke event show
+        if ($event->userHasTicket($userId) || $event->userHasBoughtReplay($userId)) {
+            return redirect()->route('event.show', $event->slug)
+                ->with('success', 'Anda sudah memiliki akses ke rekaman ini.');
+        }
+
+        // Buat order baru
+        $ref = 'RPL-' . strtoupper(Str::random(8)) . '-' . now()->format('ymd');
+
+        $order = Order::create([
+            'user_id'      => $userId,
+            'reference'    => $ref,
+            'total_amount' => $price,
+            'status'       => 'pending',
+            'meta_json'    => ['type' => 'replay', 'event_id' => $event->id],
+        ]);
+
+        OrderItem::create([
+            'order_id'   => $order->id,
+            'event_id'   => $event->id,
+            'title'      => '[Replay] ' . $event->title,
+            'unit_price' => $price,
+            'qty'        => 1,
+        ]);
+
+        // Kalau gratis (price = 0), langsung mark paid
+        if ($price === 0) {
+            $order->status = 'paid';
+            $order->paid_at = now();
+            $order->save();
+            return redirect()->route('event.show', $event->slug)
+                ->with('success', 'Akses rekaman berhasil diaktifkan!');
+        }
+
+        return redirect()->route('order.pay', $ref);
     }
 }

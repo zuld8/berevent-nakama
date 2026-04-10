@@ -57,6 +57,9 @@ Route::middleware('auth')->group(function(){
     Route::get('/order/{reference}/tickets', [TicketController::class, 'index'])->name('order.tickets');
     Route::get('/order/{reference}/tickets/print', [TicketController::class, 'print'])->name('order.tickets.print');
     Route::get('/ticket/{code}/qr', [TicketController::class, 'qr'])->name('ticket.qr');
+
+    // Replay purchase
+    Route::post('/event/{event:slug}/beli-replay', [EventController::class, 'buyReplay'])->name('event.replay.buy');
 });
 
 // Midtrans notification for orders

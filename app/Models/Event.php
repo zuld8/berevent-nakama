@@ -52,6 +52,11 @@ class Event extends Model
         return $this->hasMany(\App\Models\EventMaterial::class);
     }
 
+    public function resources()
+    {
+        return $this->hasMany(\App\Models\EventResource::class)->orderBy('sort');
+    }
+
     public function getCoverUrlAttribute(): ?string
     {
         $path = (string) ($this->cover_path ?? '');

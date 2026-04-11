@@ -61,6 +61,10 @@ Route::middleware('auth')->group(function(){
     // Replay purchase
     Route::get('/event/{event:slug}/beli-replay', [EventController::class, 'replayCheckout'])->name('event.replay.checkout');
     Route::post('/event/{event:slug}/beli-replay', [EventController::class, 'buyReplay'])->name('event.replay.buy');
+
+    // Download materi event (protected)
+    Route::get('/event/{event:slug}/resource/{resource}/download', [EventController::class, 'downloadResource'])
+        ->name('event.resource.download');
 });
 
 // Midtrans notification for orders

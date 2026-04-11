@@ -256,8 +256,69 @@ class EventResource extends Resource
                             ->placeholder('Contoh: 50000')
                             ->helperText('Kosongkan = hanya peserta bisa nonton. Isi 0 = gratis untuk semua. Isi angka = harga beli replay.'),
                     ])->columns(1)->columnSpanFull(),
+
+                Forms\Components\Section::make('📎 Materi & File')
+                    ->description('Upload file materi (PDF, PPT, Excel, dll). Hanya bisa didownload oleh peserta yang punya tiket atau sudah beli akses rekaman.')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\Repeater::make('resources')
+                            ->relationship('resources')
+                            ->label('')
+                            ->schema([
+                                Forms\Components\TextInput::make('label')
+                                    ->label('Nama File / Keterangan')
+                                    ->placeholder('Contoh: Slide Sesi 1, Template Excel...')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->columnSpan(1),
+
+                                Forms\Components\FileUpload::make('path')
+                                    ->label('Upload File')
+                                    ->required()
+                                    ->disk('private')
+                                    ->directory('event-resources')
+                                    ->visibility('private')
+                                    ->maxSize(51200) // 50MB
+                                    ->acceptedFileTypes([
+                                        'application/pdf',
+                                        'application/vnd.ms-powerpoint',
+                                        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                        'application/vnd.ms-excel',
+                                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                        'application/msword',
+                                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                        'application/zip',
+                                        'image/jpeg',
+                                        'image/png',
+                                    ])
+                                    ->saveUploadedFileUsing(function ($file, $get) {
+                                        $ext      = $file->getClientOriginalExtension();
+                                        $safeName = \Illuminate\Support\Str::random(40) . '.' . $ext;
+                                        $path     = 'event-resources/' . $safeName;
+                                        \Illuminate\Support\Facades\Storage::disk('private')->put($path, file_get_contents($file->getRealPath()));
+                                        return $path;
+                                    })
+                                    ->columnSpan(1),
+
+                                Forms\Components\Hidden::make('original_name')
+                                    ->afterStateHydrated(fn ($state) => $state)
+                                    ->dehydrateStateUsing(fn ($state, $get) => $state),
+
+                                Forms\Components\Hidden::make('disk')
+                                    ->default('private'),
+
+                                Forms\Components\Hidden::make('sort')
+                                    ->default(0),
+                            ])
+                            ->columns(2)
+                            ->defaultItems(0)
+                            ->reorderable('sort')
+                            ->addActionLabel('+ Tambah File Materi')
+                            ->columnSpanFull(),
+                    ])->columnSpanFull(),
             ]);
     }
+
 
 
     public static function table(Table $table): Table

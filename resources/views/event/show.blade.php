@@ -301,7 +301,51 @@
                     </script>
                 @endif
 
+                {{-- Materi & File (hanya untuk yang punya akses replay/tiket) --}}
+                @if ($isExpired && $canWatch && $event->resources->isNotEmpty())
+                    <div class="mt-4 rounded-2xl overflow-hidden bg-white border border-gray-200 shadow-sm">
+                        <div class="flex items-center gap-2 px-4 py-3 border-b border-gray-100 bg-gray-50">
+                            <span class="text-sm font-semibold text-gray-800">📎 Materi Event</span>
+                            <span class="ml-auto text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                                {{ $event->resources->count() }} file
+                            </span>
+                        </div>
+                        <ul class="divide-y divide-gray-100">
+                            @foreach ($event->resources as $res)
+                                <li class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition">
+                                    {{-- Icon --}}
+                                    <span class="text-xl shrink-0">{{ $res->icon() }}</span>
+
+                                    {{-- Info --}}
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-sm font-medium text-gray-900 truncate">
+                                            {{ $res->label }}
+                                        </div>
+                                        @if($res->humanSize())
+                                            <div class="text-[11px] text-gray-400 mt-0.5">{{ $res->humanSize() }}</div>
+                                        @endif
+                                    </div>
+
+                                    {{-- Download button --}}
+                                    <a href="{{ route('event.resource.download', [$event->slug, $res->id]) }}"
+                                       class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-sky-50 border border-sky-200 px-3 py-1.5 text-xs font-semibold text-sky-700 hover:bg-sky-100 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5">
+                                            <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z"/>
+                                            <path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"/>
+                                        </svg>
+                                        Download
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                        <div class="px-4 py-2 bg-gray-50 text-[10px] text-gray-400 text-center border-t border-gray-100">
+                            🔒 Materi eksklusif untuk peserta & pembeli rekaman
+                        </div>
+                    </div>
+                @endif
+
                 {{-- CTA moved to fixed bottom bar --}}
+
             </div>
         </div>
     </main>

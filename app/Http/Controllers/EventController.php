@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Event;
+use App\Models\EventResource;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Organization;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class EventController extends Controller
@@ -96,6 +98,7 @@ class EventController extends Controller
                 $q->orderBy('date_at')->orderBy('id');
             },
             'materials.mentor:id,name,profession,photo_path',
+            'resources',
         ]);
 
         $userId = auth()->id();
@@ -287,5 +290,30 @@ class EventController extends Controller
             'type'      => 'direct',
             'embed_url' => $replayRaw,
         ]);
+    }
+
+    /**
+     * Download materi event — hanya untuk peserta / pembeli replay.
+     */
+    public function downloadResource(Event $event, EventResource $resource)
+    {
+        // Pastikan resource milik event ini
+        abort_if($resource->event_id !== $event->id, 404);
+
+        $userId = auth()->id();
+
+        // Validasi akses: punya tiket ATAU sudah beli replay
+        $canAccess = $event->userCanWatchFree($userId) || $event->userHasBoughtReplay($userId);
+        if (! $canAccess) {
+            abort(403, 'Anda tidak memiliki akses ke materi ini.');
+        }
+
+        $disk = $resource->disk ?: 'private';
+        abort_unless(Storage::disk($disk)->exists($resource->path), 404, 'File tidak ditemukan.');
+
+        return Storage::disk($disk)->download(
+            $resource->path,
+            $resource->original_name ?: basename($resource->path)
+        );
     }
 }

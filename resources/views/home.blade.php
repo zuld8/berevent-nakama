@@ -31,9 +31,7 @@
 @section('seo_canonical',   $homeUrl)
 @section('og_title',        $siteName . ' — Event & Workshop')
 @section('og_description',  $metaDesc)
-@if($ogImage)
-@section('og_image',        $ogImage)
-@endif
+@section('og_image',        $ogImage ?? '')
 
 @push('json_ld')
 <script type="application/ld+json">

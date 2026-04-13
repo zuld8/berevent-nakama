@@ -23,9 +23,7 @@
 @section('og_type',         'article')
 @section('og_title',        $seoTitle)
 @section('og_description',  $seoDesc)
-@if($seoImage)
-@section('og_image',        $seoImage)
-@endif
+@section('og_image',        $seoImage ?? '')
 
 @push('json_ld')
 <script type="application/ld+json">

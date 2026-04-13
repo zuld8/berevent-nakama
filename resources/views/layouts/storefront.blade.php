@@ -12,7 +12,7 @@
     <meta name="robots" content="@yield('seo_robots', 'index, follow')" />
     <meta name="author" content="{{ config('app.name', 'Nakama Project Hub') }}" />
     <meta http-equiv="Content-Language" content="id-ID" />
-    @hasSection('seo_canonical')
+    @if(View::hasSection('seo_canonical'))
         <link rel="canonical" href="@yield('seo_canonical')" />
     @endif
 
@@ -23,17 +23,21 @@
     <meta property="og:title" content="@yield('og_title', config('app.name', 'Nakama Project Hub'))" />
     <meta property="og:description" content="@yield('og_description', 'Platform event, workshop, dan komunitas terpercaya.')" />
     <meta property="og:url" content="@yield('seo_canonical', url()->current())" />
-    @hasSection('og_image')
+    @if(View::hasSection('og_image'))
         <meta property="og:image" content="@yield('og_image')" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
     @endif
 
     {{-- ── Twitter Card ── --}}
-    <meta name="twitter:card" content="@hasSection('og_image')summary_large_image@else summary@endif" />
+    @if(View::hasSection('og_image'))
+        <meta name="twitter:card" content="summary_large_image" />
+    @else
+        <meta name="twitter:card" content="summary" />
+    @endif
     <meta name="twitter:title" content="@yield('og_title', config('app.name', 'Nakama Project Hub'))" />
     <meta name="twitter:description" content="@yield('og_description', 'Platform event, workshop, dan komunitas terpercaya.')" />
-    @hasSection('og_image')
+    @if(View::hasSection('og_image'))
         <meta name="twitter:image" content="@yield('og_image')" />
     @endif
 

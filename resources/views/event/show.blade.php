@@ -1,8 +1,75 @@
 @extends('layouts.storefront')
 
-@section('title', $event->title)
+@php
+    // ── SEO prep (pakai data dari controller) ──────────────────────────────
+    $seoTitle       = $event->title . ' — ' . config('app.name', 'Nakama Project Hub');
+    $seoDesc        = $event->description
+        ? \Illuminate\Support\Str::limit(strip_tags($event->description), 158)
+        : 'Daftar & ikuti event ' . $event->title . ' di Nakama Project Hub. Tiket online, rekaman eksklusif, dan materi tersedia.';
+    $seoUrl         = route('event.show', $event->slug);
+    $seoImage       = $event->cover_url ?? null;
+    $eventMode      = match((string) $event->mode) {
+        'online'  => 'online',
+        'offline' => 'offline',
+        default   => 'mixed',
+    };
+    $isFree = ($event->price_type ?? 'fixed') !== 'fixed'
+        || ((float)($event->price ?? 0)) === 0.0;
+@endphp
+
+@section('seo_title',       $seoTitle)
+@section('seo_description', $seoDesc)
+@section('seo_canonical',   $seoUrl)
+@section('og_type',         'article')
+@section('og_title',        $seoTitle)
+@section('og_description',  $seoDesc)
+@if($seoImage)
+@section('og_image',        $seoImage)
+@endif
+
+@push('json_ld')
+<script type="application/ld+json">
+{!! json_encode(array_filter([
+    '@context'    => 'https://schema.org',
+    '@type'       => 'Event',
+    'name'        => $event->title,
+    'description' => $seoDesc,
+    'url'         => $seoUrl,
+    'image'       => $seoImage,
+    'startDate'   => $event->start_date ? \Carbon\Carbon::parse($event->start_date)->toIso8601String() : null,
+    'endDate'     => $event->end_date   ? \Carbon\Carbon::parse($event->end_date)->toIso8601String()   : null,
+    'eventStatus' => 'https://schema.org/EventScheduled',
+    'eventAttendanceMode' => match($eventMode) {
+        'online'  => 'https://schema.org/OnlineEventAttendanceMode',
+        'offline' => 'https://schema.org/OfflineEventAttendanceMode',
+        default   => 'https://schema.org/MixedEventAttendanceMode',
+    },
+    'location' => $eventMode === 'online' ? [
+        '@type' => 'VirtualLocation',
+        'url'   => $seoUrl,
+    ] : [
+        '@type'   => 'Place',
+        'name'    => 'Venue',
+        'address' => ['@type' => 'PostalAddress', 'addressCountry' => 'ID'],
+    ],
+    'organizer' => $event->organization ? [
+        '@type' => 'Organization',
+        'name'  => $event->organization->name,
+        'url'   => config('app.url'),
+    ] : null,
+    'offers' => [[
+        '@type'         => 'Offer',
+        'url'           => $seoUrl,
+        'price'         => $isFree ? '0' : (string) (int) ($event->price ?? 0),
+        'priceCurrency' => 'IDR',
+        'availability'  => 'https://schema.org/InStock',
+    ]],
+]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+</script>
+@endpush
 
 @section('content')
+
     @php
         $start = $event->start_date ? \Illuminate\Support\Carbon::parse($event->start_date) : null;
         $end = $event->end_date ? \Illuminate\Support\Carbon::parse($event->end_date) : null;

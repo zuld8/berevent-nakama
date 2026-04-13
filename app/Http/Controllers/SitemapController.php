@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Campaign;
 use App\Models\Category;
+use App\Models\Event;
 use App\Models\News;
 use App\Models\Page;
 use Illuminate\Http\Response;
@@ -57,6 +58,20 @@ class SitemapController extends Controller
                     'changefreq' => 'weekly',
                     'priority' => '0.6',
                     'lastmod' => optional($cat->updated_at)->toAtomString() ?? now()->toAtomString(),
+                ];
+            });
+
+        // Events (published)
+        Event::query()
+            ->where('status', 'published')
+            ->orderByDesc('updated_at')
+            ->get(['slug', 'updated_at'])
+            ->each(function ($e) use (&$urls) {
+                $urls[] = [
+                    'loc'        => route('event.show', $e->slug),
+                    'changefreq' => 'weekly',
+                    'priority'   => '0.9',
+                    'lastmod'    => optional($e->updated_at)->toAtomString(),
                 ];
             });
 

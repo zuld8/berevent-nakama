@@ -1,113 +1,70 @@
 @extends('layouts.storefront')
+
+@php
+    $appName        = config('app.name', 'Nakama Project Hub');
+    $siteUrl        = config('app.url', url('/'));
+    $homeUrl        = route('home');
+    $siteName       = $org->name ?? $appName;
+    $metaDesc       = 'Platform event, workshop, seminar, dan komunitas online & offline terpercaya di Indonesia. Daftar tiket, akses rekaman eksklusif, dan download materi di ' . $siteName . '.';
+    $hasHero        = isset($heroes) && $heroes->count() > 0;
+    $firstHeroImage = $hasHero ? optional($heroes->first())->image_url : null;
+    $ogImage        = $org->logo_url ?? $firstHeroImage ?? null;
+    $soc            = $org->social_json ?? [];
+    $sameAs         = array_values(array_filter([
+        $soc['instagram'] ?? null,
+        $soc['facebook']  ?? null,
+        $soc['twitter']   ?? ($soc['x'] ?? null),
+        $soc['youtube']   ?? null,
+        $soc['linkedin']  ?? null,
+        $soc['tiktok']    ?? null,
+    ]));
+
+    // Analytics
+    $analytics  = $org?->meta_json['analytics'] ?? [];
+    $fbPixelId  = $analytics['facebook_pixel_id'] ?? null;
+    $gtmId      = $analytics['gtm_id'] ?? null;
+@endphp
+
+{{-- ── SEO sections ───────────────────────────────────────────────────────── --}}
+@section('seo_title',       $siteName . ' — Event, Workshop & Komunitas Indonesia')
+@section('seo_description', $metaDesc)
+@section('seo_canonical',   $homeUrl)
+@section('og_title',        $siteName . ' — Event & Workshop')
+@section('og_description',  $metaDesc)
+@if($ogImage)
+@section('og_image',        $ogImage)
+@endif
+
+@push('json_ld')
+<script type="application/ld+json">
+{!! json_encode(array_filter([
+    '@context' => 'https://schema.org',
+    '@type'    => 'Organization',
+    'name'     => $siteName,
+    'url'      => $siteUrl,
+    'logo'     => $ogImage,
+    'sameAs'   => !empty($sameAs) ? $sameAs : null,
+]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endpush
+
 @push('head')
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-        {{ env('APP_NAME') }} — Beranda
-    </title>
-    @php
-        $appName = env('APP_NAME');
-        $siteUrl = config('app.url') ?? url('/');
-        $homeUrl = route('home');
-        $siteName = $org->name ?? $appName ?? 'Berdonasi.id';
-        $metaDescription = 'Berdonasi.id adalah platform donasi online yang lahir dari semangat untuk memudahkan siapa pun berbuat kebaikan, kapan pun dan di mana pun. Kami percaya bahwa setiap niat baik, sekecil apa pun, dapat membawa perubahan besar bagi mereka yang membutuhkan.';
-        $hasHero = isset($heroes) && $heroes->count() > 0;
-        $firstHeroImage = $hasHero ? optional($heroes->first())->image_url : null;
-        $ogImage = $org->logo_url ?? $firstHeroImage ?? asset('favicon.ico');
-        $twitterCard = $ogImage ? 'summary_large_image' : 'summary';
-        $soc = $org->social_json ?? [];
-        $sameAs = array_values(array_filter([
-            $soc['instagram'] ?? null,
-            $soc['facebook'] ?? null,
-            $soc['twitter'] ?? ($soc['x'] ?? null),
-            $soc['youtube'] ?? null,
-            $soc['linkedin'] ?? null,
-            $soc['tiktok'] ?? null,
-        ]));
-    @endphp
-
-    <!-- Primary Meta -->
-    <meta name="description" content="{{ $metaDescription }}" />
-    <meta name="keywords" content="donasi online, sedekah, zakat, wakaf, galang dana, berdonasi, charity, amal, Indonesia" />
-    <meta name="robots" content="index, follow" />
-    <meta name="author" content="{{ $siteName }}" />
-    <meta http-equiv="Content-Language" content="id-ID" />
-    <link rel="canonical" href="{{ $homeUrl }}" />
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="{{ $siteName }} — Beranda" />
-    <meta property="og:description" content="{{ $metaDescription }}" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="{{ $homeUrl }}" />
-    <meta property="og:site_name" content="{{ $siteName }}" />
-    <meta property="og:locale" content="id_ID" />
-    @if ($ogImage)
-        <meta property="og:image" content="{{ $ogImage }}" />
-    @endif
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="{{ $twitterCard }}" />
-    <meta name="twitter:title" content="{{ $siteName }} — Beranda" />
-    <meta name="twitter:description" content="{{ $metaDescription }}" />
-    @if ($ogImage)
-        <meta name="twitter:image" content="{{ $ogImage }}" />
-    @endif
-
-    <!-- Brand / PWA niceties -->
-    <meta name="theme-color" content="#0ea5e9" />
-    <link rel="icon" href="/favicon.ico" />
-
-    <!-- Structured Data: WebSite -->
-    <script type="application/ld+json">
-    {!! json_encode([
-        '@context' => 'https://schema.org',
-        '@type' => 'WebSite',
-        'name' => $siteName,
-        'url' => $homeUrl,
-        'potentialAction' => [
-            '@type' => 'SearchAction',
-            'target' => $homeUrl . '?q={search_term_string}',
-            'query-input' => 'required name=search_term_string',
-        ],
-    ], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
-    </script>
-
-    <!-- Structured Data: Organization -->
-    <script type="application/ld+json">
-    {!! json_encode(array_filter([
-        '@context' => 'https://schema.org',
-        '@type' => 'Organization',
-        'name' => $siteName,
-        'url' => $siteUrl,
-        'logo' => $ogImage,
-        'sameAs' => !empty($sameAs) ? $sameAs : null,
-    ]), JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) !!}
-    </script>
-
-    @php
-        $analytics = $org?->meta_json['analytics'] ?? [];
-        $fbPixelId = $analytics['facebook_pixel_id'] ?? null;
-        $gtmId = $analytics['gtm_id'] ?? null;
-    @endphp
+    <meta name="keywords" content="event online, workshop, seminar, tiket event, komunitas, nakama, Indonesia" />
     @include('partials.gtm-head', ['gtmId' => $gtmId])
     @if (!empty($fbPixelId))
         <script>
-            !function (f, b, e, v, n, t, s) {
-                if (f.fbq) return; n = f.fbq = function () {
-                    n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-                }; if (!f._fbq) f._fbq = n;
-                n.push = n; n.loaded = !0; n.version = '2.0'; n.queue = []; t = b.createElement(e); t.async = !0;
-                t.src = v; s = b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t, s)
-            }(window, document, 'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '{{ $fbPixelId }}');
-            fbq('track', 'PageView');
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+            n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+            document,'script','https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init','{{ $fbPixelId }}');fbq('track','PageView');
         </script>
         <noscript><img height="1" width="1" style="display:none"
-                 src="https://www.facebook.com/tr?id={{ $fbPixelId }}&ev=PageView&noscript=1" /></noscript>
+            src="https://www.facebook.com/tr?id={{ $fbPixelId }}&ev=PageView&noscript=1"/></noscript>
     @endif
 @endpush
+
 @section('content')
     @include('partials.gtm-body', ['gtmId' => $gtmId])
     <main class="mx-auto max-w-7xl px-4 py-4">

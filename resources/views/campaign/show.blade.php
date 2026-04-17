@@ -117,7 +117,7 @@
                     </div>
                 </div>
             @else
-                <div class="relative w-full overflow-hidden rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
+                <div class="relative w-full overflow-hidden rounded-xl bg-gradient-to-br from-teal-600 to-teal-800 shadow-lg">
                     <div class="p-8 sm:p-12 lg:p-16">
                         <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
                             {{ $c->title }}
@@ -137,7 +137,7 @@
                 {{-- Progress Bar --}}
                 <div class="mb-4">
                     <div class="h-3 w-full overflow-hidden rounded-full bg-gray-100">
-                        <div class="h-full rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 transition-all duration-700"
+                        <div class="h-full rounded-full bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 transition-all duration-700"
                              style="width: {{ $progress }}%"></div>
                     </div>
                 </div>
@@ -145,7 +145,7 @@
                 {{-- Stats Grid --}}
                 <div class="grid grid-cols-3 gap-4 text-center">
                     <div>
-                        <div class="text-lg sm:text-xl font-bold text-amber-600">
+                        <div class="text-lg sm:text-xl font-bold text-teal-600">
                             Rp {{ number_format((float) $c->raised_amount, 0, ',', '.') }}
                         </div>
                         <div class="text-xs text-gray-500 mt-0.5">
@@ -181,7 +181,7 @@
                         @endif
                     @else
                         <a href="{{ route('campaign.donate.form', $c->slug) }}"
-                           class="block w-full rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-3.5 text-center text-base font-bold text-white shadow-md hover:from-amber-600 hover:to-orange-600 hover:shadow-lg transition-all duration-200">
+                           class="block w-full rounded-xl bg-gradient-to-r from-teal-500 to-teal-600 px-6 py-3.5 text-center text-base font-bold text-white shadow-md hover:from-teal-600 hover:to-teal-700 hover:shadow-lg transition-all duration-200">
                             ❤️ Donasi Sekarang
                         </a>
                     @endif
@@ -204,7 +204,7 @@
                                 @endphp
                                 @foreach ($tabs as $key => $label)
                                     <a href="{{ request()->fullUrlWithQuery(['tab' => $key]) }}"
-                                       class="flex-1 text-center whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors {{ $activeTab === $key ? 'border-b-2 border-amber-500 text-amber-700' : 'text-gray-500 hover:text-amber-600' }}">{{ $label }}</a>
+                                       class="flex-1 text-center whitespace-nowrap px-4 py-3 text-sm font-medium transition-colors {{ $activeTab === $key ? 'border-b-2 border-teal-500 text-teal-700' : 'text-gray-500 hover:text-teal-600' }}">{{ $label }}</a>
                                 @endforeach
                             </nav>
                         </div>
@@ -215,7 +215,7 @@
                                     <div class="mb-4 flex flex-wrap gap-2">
                                         @foreach ($c->categories as $cat)
                                             <a href="{{ route('home', ['category' => $cat->slug]) }}"
-                                               class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-200">#{{ $cat->name }}</a>
+                                               class="rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700 ring-1 ring-teal-200">#{{ $cat->name }}</a>
                                         @endforeach
                                     </div>
                                 @endif
@@ -237,15 +237,15 @@
                                 @else
                                     <div class="space-y-4">
                                         @foreach ($articles as $a)
-                                            <div class="border-l-3 border-amber-400 pl-4">
+                                            <div class="border-l-3 border-teal-400 pl-4">
                                                 <div class="text-xs text-gray-400 mb-1">
                                                     {{ optional($a->published_at)->format('d M Y') ?? '—' }}</div>
                                                 <h3 class="text-sm font-semibold">
-                                                    <a class="text-amber-700 hover:underline"
+                                                    <a class="text-teal-700 hover:underline"
                                                        href="{{ route('article.show', ['id' => $a->id, 'slug' => \Illuminate\Support\Str::slug($a->title)]) }}">{{ $a->title }}</a>
                                                 </h3>
                                                 @if ($a->payout?->amount)
-                                                    <span class="inline-block mt-1 rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700">
+                                                    <span class="inline-block mt-1 rounded-full bg-teal-50 px-2 py-0.5 text-xs text-teal-700">
                                                         Rp {{ number_format((float) $a->payout->amount, 0, ',', '.') }}</span>
                                                 @endif
                                             </div>
@@ -271,12 +271,12 @@
                                                 $initials = mb_strtoupper($initials ?: 'NA');
                                             @endphp
                                             <li class="flex items-center gap-3 py-3">
-                                                <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
+                                                <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-teal-100 text-xs font-bold text-teal-700">
                                                     {{ $initials }}</div>
                                                 <div class="min-w-0 flex-1">
                                                     <div class="flex items-center justify-between gap-2">
                                                         <div class="text-sm font-semibold text-gray-900">{{ $displayName }}</div>
-                                                        <div class="text-sm font-bold text-amber-600 whitespace-nowrap">Rp {{ number_format((float) $d->amount, 0, ',', '.') }}</div>
+                                                        <div class="text-sm font-bold text-teal-600 whitespace-nowrap">Rp {{ number_format((float) $d->amount, 0, ',', '.') }}</div>
                                                     </div>
                                                     <div class="text-xs text-gray-400">{{ optional($d->paid_at)->diffForHumans() }}</div>
                                                     @if (!empty($d->message))
@@ -304,10 +304,10 @@
     <div id="fab-share-bar" class="fixed inset-x-0 bottom-0 z-30 bg-white border-t border-gray-200 shadow-lg">
         <div class="mx-auto max-w-7xl px-4 py-3 flex items-center gap-3">
             <button type="button" id="fab-share-trigger"
-                    class="inline-flex items-center justify-center rounded-lg border border-orange-400 bg-white px-5 py-2.5 text-sm font-semibold text-orange-600 hover:bg-orange-50 transition-colors"
+                    class="inline-flex items-center justify-center rounded-lg border border-teal-400 bg-white px-5 py-2.5 text-sm font-semibold text-teal-600 hover:bg-teal-50 transition-colors"
                     aria-label="Bagikan">Bagikan</button>
             <a href="{{ route('campaign.donate.form', $c->slug) }}"
-               class="flex-1 inline-flex items-center justify-center rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-orange-600 transition-colors">Donasi</a>
+               class="flex-1 inline-flex items-center justify-center rounded-lg bg-teal-500 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-teal-600 transition-colors">Donasi</a>
 
             <div id="fab-share-popover"
                  class="pointer-events-auto invisible absolute bottom-14 left-4 right-4 translate-y-2 opacity-0 transition-all duration-150 ease-out">

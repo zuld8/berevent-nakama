@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Nakama Project — Color Palette</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; min-height:100vh; padding: 48px 24px; }
+
+h1 { text-align:center; font-size:32px; font-weight:900; color:#f8fafc; margin-bottom:6px; letter-spacing:-0.5px; }
+.subtitle { text-align:center; color:#64748b; margin-bottom:52px; font-size:15px; }
+.highlight { color:#38bdf8; }
+
+.grid { display:grid; grid-template-columns:1fr; gap:32px; max-width:860px; margin:0 auto; }
+
+.card { border-radius:20px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
+
+/* HEADER */
+.card-header { padding:24px 28px 16px; }
+.badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:1.5px; padding:4px 12px; border-radius:99px; margin-bottom:12px; text-transform:uppercase; }
+.card-header h2 { font-size:22px; font-weight:800; margin-bottom:4px; }
+.card-header p { font-size:13px; opacity:0.7; }
+
+/* SWATCHES */
+.swatches { display:flex; height:110px; }
+.swatch { flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding:10px 8px; }
+.swatch .hex { font-size:10px; font-weight:700; font-family:monospace; }
+.swatch .name { font-size:9px; margin-top:2px; opacity:0.8; }
+
+/* BUTTONS PREVIEW */
+.preview { padding:20px 28px 24px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.preview-label { font-size:11px; color:#64748b; margin-right:4px; width:100%; }
+.btn { font-size:12px; font-weight:600; padding:7px 18px; border-radius:8px; cursor:default; border:none; font-family: 'Inter', sans-serif; }
+
+/* ======= KONSEP A ======= */
+.card-a { background:#0f172a; border:1px solid #1e3a5f; }
+.card-a .badge { background:#0ea5e9; color:#0c4a6e; }
+.card-a h2 { color:#f8fafc; }
+.card-a p { color:#94a3b8; }
+
+/* ======= KONSEP B ======= */
+.card-b { background:#1e1b4b; border:1px solid #312e81; }
+.card-b .badge { background:#6366f1; color:#fff; }
+.card-b h2 { color:#f8fafc; }
+.card-b p { color:#a5b4fc; }
+
+/* ======= KONSEP C ======= */
+.card-c { background:#18181b; border:1px solid #3f3f46; }
+.card-c .badge { background:#f97316; color:#fff; }
+.card-c h2 { color:#f8fafc; }
+.card-c p { color:#a1a1aa; }
+
+/* DIVIDER */
+.divider { height:1px; opacity:0.1; background:#fff; margin:0 28px; }
+
+.recommend { text-align:center; margin-top:40px; padding:24px; background:#1e293b; border-radius:16px; max-width:860px; margin:40px auto 0; }
+.recommend p { color:#94a3b8; font-size:14px; line-height:1.8; }
+.recommend strong { color:#f8fafc; }
+</style>
+</head>
+<body>
+
+<h1>🎨 <span class="highlight">Nakama Project</span> — Color Palette</h1>
+<p class="subtitle">Pilih konsep warna yang paling cocok untuk branding platform</p>
+
+<div class="grid">
+
+  <!-- ===== KONSEP A ===== -->
+  <div class="card card-a">
+    <div class="card-header">
+      <div class="badge">KONSEP A</div>
+      <h2>Navy × Sky Blue × Gold</h2>
+      <p>✦ Professional & Trustworthy — Corporate events, workshop B2B, seminar profesional</p>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#0F172A;">
+        <span class="hex" style="color:#475569;">#0F172A</span>
+        <span class="name" style="color:#334155;">Deep Navy</span>
+      </div>
+      <div class="swatch" style="background:#1e3a5f;">
+        <span class="hex" style="color:#7dd3fc;">#1E3A5F</span>
+        <span class="name" style="color:#60a5fa;">Navy Mid</span>
+      </div>
+      <div class="swatch" style="background:#38BDF8;">
+        <span class="hex" style="color:#0c4a6e;">#38BDF8</span>
+        <span class="name" style="color:#075985;">Sky Blue</span>
+      </div>
+      <div class="swatch" style="background:#F59E0B;">
+        <span class="hex" style="color:#451a03;">#F59E0B</span>
+        <span class="name" style="color:#78350f;">Gold</span>
+      </div>
+      <div class="swatch" style="background:#F1F5F9; border-radius:0 0 0 0;">
+        <span class="hex" style="color:#475569;">#F1F5F9</span>
+        <span class="name" style="color:#64748b;">Light</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="preview">
+      <div class="preview-label">Button preview:</div>
+      <button class="btn" style="background:#38bdf8;color:#0c4a6e;">Daftar Sekarang</button>
+      <button class="btn" style="background:#f59e0b;color:#451a03;">⭐ Premium</button>
+      <button class="btn" style="background:transparent;color:#38bdf8;border:1.5px solid #38bdf8;">Lihat Event</button>
+    </div>
+  </div>
+
+  <!-- ===== KONSEP B ===== -->
+  <div class="card card-b">
+    <div class="card-header">
+      <div class="badge">KONSEP B</div>
+      <h2>Indigo × Purple × Emerald</h2>
+      <p>✦ Modern Startup & Learning — Platform edukasi, tech community, audience muda kreatif</p>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#1E1B4B;">
+        <span class="hex" style="color:#818cf8;">#1E1B4B</span>
+        <span class="name" style="color:#6366f1;">Dark</span>
+      </div>
+      <div class="swatch" style="background:#6366F1;">
+        <span class="hex" style="color:#fff;">#6366F1</span>
+        <span class="name" style="color:#e0e7ff;">Indigo</span>
+      </div>
+      <div class="swatch" style="background:#8B5CF6;">
+        <span class="hex" style="color:#fff;">#8B5CF6</span>
+        <span class="name" style="color:#ede9fe;">Purple</span>
+      </div>
+      <div class="swatch" style="background:#10B981;">
+        <span class="hex" style="color:#fff;">#10B981</span>
+        <span class="name" style="color:#d1fae5;">Emerald</span>
+      </div>
+      <div class="swatch" style="background:#EDE9FE;">
+        <span class="hex" style="color:#5b21b6;">#EDE9FE</span>
+        <span class="name" style="color:#7c3aed;">Lavender</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="preview">
+      <div class="preview-label">Button preview:</div>
+      <button class="btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;">Daftar Sekarang</button>
+      <button class="btn" style="background:#10b981;color:#fff;">✓ Completed</button>
+      <button class="btn" style="background:transparent;color:#a5b4fc;border:1.5px solid #6366f1;">Lihat Event</button>
+    </div>
+  </div>
+
+  <!-- ===== KONSEP C ===== -->
+  <div class="card card-c">
+    <div class="card-header">
+      <div class="badge">KONSEP C</div>
+      <h2>Coral × Charcoal × Yellow</h2>
+      <p>✦ Energetic & Community — Event komunitas, festival, seminar umum, audience luas</p>
+    </div>
+    <div class="swatches">
+      <div class="swatch" style="background:#18181B;">
+        <span class="hex" style="color:#71717a;">#18181B</span>
+        <span class="name" style="color:#52525b;">Charcoal</span>
+      </div>
+      <div class="swatch" style="background:#3f3f46;">
+        <span class="hex" style="color:#d4d4d8;">#3F3F46</span>
+        <span class="name" style="color:#a1a1aa;">Dark Gray</span>
+      </div>
+      <div class="swatch" style="background:#F97316;">
+        <span class="hex" style="color:#fff;">#F97316</span>
+        <span class="name" style="color:#ffedd5;">Coral</span>
+      </div>
+      <div class="swatch" style="background:#FCD34D;">
+        <span class="hex" style="color:#451a03;">#FCD34D</span>
+        <span class="name" style="color:#78350f;">Yellow</span>
+      </div>
+      <div class="swatch" style="background:#FFF7ED;">
+        <span class="hex" style="color:#c2410c;">#FFF7ED</span>
+        <span class="name" style="color:#ea580c;">Peach</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="preview">
+      <div class="preview-label">Button preview:</div>
+      <button class="btn" style="background:#f97316;color:#fff;">Daftar Sekarang</button>
+      <button class="btn" style="background:#fcd34d;color:#18181b;">🔥 Hot Event</button>
+      <button class="btn" style="background:transparent;color:#f97316;border:1.5px solid #f97316;">Lihat Event</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="recommend">
+  <p>
+    <strong>A (Navy + Sky)</strong> → Premium, korporat, trustworthy &nbsp;|&nbsp;
+    <strong>B (Indigo + Purple)</strong> → Modern, tech, kreatif &nbsp;|&nbsp;
+    <strong>C (Coral + Charcoal)</strong> → Fun, energik, komunitas
+  </p>
+</div>
+
+</body>
+</html>

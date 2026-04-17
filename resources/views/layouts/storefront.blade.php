@@ -46,19 +46,17 @@
     <link rel="icon" href="/favicon.ico" />
 
     {{-- ── Structured Data (JSON-LD) ── --}}
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "{{ config('app.name', 'Nakama Project Hub') }}",
-        "url": "{{ config('app.url', url('/')) }}",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "{{ url('/') }}?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-        }
-    }
-    </script>
+    <script type="application/ld+json">{!! json_encode([
+        '@context'        => 'https://schema.org',
+        '@type'           => 'WebSite',
+        'name'            => config('app.name', 'Nakama Project Hub'),
+        'url'             => config('app.url', url('/')),
+        'potentialAction' => [
+            '@type'       => 'SearchAction',
+            'target'      => url('/') . '?q={search_term_string}',
+            'query-input' => 'required name=search_term_string',
+        ],
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
     @stack('json_ld')
 
     @vite(['resources/css/app.css','resources/js/app.js'])

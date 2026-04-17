@@ -1,17 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* ============================================
-   NAKAMA PROJECT HUB — PREMIUM ADMIN THEME
-   ============================================ */
+/* ================================================
+   NAKAMA PROJECT — BRAND DESIGN SYSTEM
+   KONSEP I · LAW — Dark × Teal × White
+   ================================================
+
+   PALETTE:
+   ─ Abyss      #020617  → deepest background
+   ─ Navy Dark  #0F172A  → sidebar, dark surfaces
+   ─ Navy Mid   #1E293B  → cards, elevated surfaces
+   ─ Teal       #0D9488  → primary brand, CTA
+   ─ Teal Light #2DD4BF  → hover states, accents
+   ─ Ice White  #F0FDFA  → light backgrounds
+   ─ White      #FFFFFF  → clean surfaces
+   ================================================ */
 
 :root {
-    --np-navy: #0f172a;
-    --np-navy-light: #1e293b;
-    --np-teal: #0d9488;
-    --np-teal-light: #14b8a6;
-    --np-amber: #f59e0b;
-    --np-amber-light: #fbbf24;
+    /* Core brand tokens */
+    --np-abyss:       #020617;
+    --np-navy:        #0F172A;
+    --np-navy-light:  #1E293B;
+    --np-navy-mid:    #334155;
+    --np-teal:        #0D9488;
+    --np-teal-light:  #2DD4BF;
+    --np-teal-faint:  #99F6E4;
+    --np-ice:         #F0FDFA;
+    --np-white:       #FFFFFF;
+
+    /* Semantic aliases */
+    --np-primary:           var(--np-teal);
+    --np-primary-hover:     var(--np-teal-light);
+    --np-primary-faint:     rgba(13, 148, 136, 0.12);
+    --np-bg-dark:           var(--np-navy);
+    --np-bg-surface:        var(--np-navy-light);
+    --np-bg-light:          var(--np-ice);
+    --np-text-light:        #E2E8F0;
+    --np-text-muted:        #94A3B8;
+    --np-border-dark:       rgba(255, 255, 255, 0.06);
+    --np-border-light:      rgba(13, 148, 136, 0.15);
+
+    /* Legacy compat */
+    --np-amber:       var(--np-teal-light);
+    --np-amber-light: var(--np-teal-faint);
 }
+
 
 /* --- Font Override --- */
 body,
@@ -205,7 +237,7 @@ body,
 }
 
 .fi-ta-row:hover {
-    background: rgba(14, 165, 233, 0.03) !important;
+    background: rgba(13, 148, 136, 0.04) !important;
 }
 
 /* --- Buttons --- */

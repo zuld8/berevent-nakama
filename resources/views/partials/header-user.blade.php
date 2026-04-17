@@ -19,8 +19,8 @@
 <div class="space-y-3">
 
     @if($user)
-        <div class="flex items-start justify-between mb-4">
-            <div class="flex items-start gap-3">
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
                 <img src="{{ $user?->profile_photo_url ?? ($user?->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? 'U') . '&background=E5E7EB&color=111827') }}"
                      alt="Avatar" class="h-10 w-10 rounded-full object-cover ring-1 ring-gray-200" />
 
@@ -33,14 +33,6 @@
                             <circle cx="12" cy="10.8" r="2.2" stroke-width="1.8" />
                         </svg>
                         <span>Indonesia</span>
-
-                        {{-- <button type="button" class="ml-1 inline-flex items-center justify-center rounded-md"
-                                aria-label="Change location" title="Change location">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24"
-                                 fill="currentColor">
-                                <path d="M7 10l5 5 5-5H7z" />
-                            </svg>
-                        </button> --}}
                     </div>
 
                     <div class="text-md font-semi leading-6 text-gray-500">
@@ -50,6 +42,11 @@
             </div>
 
             <div class="flex items-center gap-2">
+                {{-- Logo icon (small) untuk user yang login --}}
+                <a href="{{ route('home') }}" class="inline-flex items-center" aria-label="Nakama Project Home">
+                    <img src="/images/logo-icon.svg" alt="Nakama Project" class="h-8 w-8" />
+                </a>
+
                 <a href="{{ $notifUrl }}"
                    class="relative inline-flex h-9 w-9 items-center justify-center rounded-full ring-1 ring-gray-200 hover:bg-gray-50">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" class="h-5 w-5 text-gray-800" viewBox="0 0 24 24"
@@ -80,6 +77,19 @@
                             {{ $cartCount > 9 ? '9+' : $cartCount }}
                         </span>
                     @endif
+                </a>
+            </div>
+        </div>
+    @else
+        {{-- Guest: tampilkan full logo lockup + tombol login --}}
+        <div class="flex items-center justify-between mb-4">
+            <a href="{{ route('home') }}" class="inline-flex items-center" aria-label="Nakama Project Home">
+                <img src="/images/logo-full.svg" alt="Nakama Project" class="h-9" />
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('login') }}"
+                   class="inline-flex items-center gap-1.5 rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 transition-colors">
+                    Masuk
                 </a>
             </div>
         </div>

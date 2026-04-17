@@ -42,8 +42,9 @@
     @endif
 
     {{-- ── PWA / Theme ── --}}
-    <meta name="theme-color" content="#0ea5e9" />
-    <link rel="icon" href="/favicon.ico" />
+    <meta name="theme-color" content="#0D9488" />
+    <link rel="icon" type="image/svg+xml" href="/images/logo-icon.svg" />
+    <link rel="apple-touch-icon" href="/images/logo-icon.svg" />
 
     {{-- ── Structured Data (JSON-LD) ── --}}
     <script type="application/ld+json">{!! json_encode([

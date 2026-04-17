@@ -33,20 +33,14 @@
         /* Highlight selected payment type cards (uses brand colors) */
         label:has(#paytype-automatic:checked),
         label:has(#paytype-manual:checked) {
-            border-color: var(--color-orange-500);
-            /* brand primary */
-            /* Fallback + modern color-mix tied to brand */
-            box-shadow: 0 0 0 1px rgba(242, 103, 34, .15);
-            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-orange-500) 15%, transparent);
+            border-color: var(--color-teal-500);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-teal-500) 15%, transparent);
         }
 
         /* Highlight selected Midtrans method card (uses brand colors) */
         label:has(.midtrans-method-radio:checked)>.method-card {
-            border-color: var(--color-orange-500);
-            /* brand primary */
-            /* Fallback + modern color-mix tied to brand */
-            box-shadow: 0 0 0 1px rgba(242, 103, 34, .15);
-            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-orange-500) 15%, transparent);
+            border-color: var(--color-teal-500);
+            box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-teal-500) 15%, transparent);
             border-width: 1px;
         }
     </style>
@@ -204,7 +198,7 @@
 
                 <div class="mt-3 relative" id="submit-wrapper">
                     <button id="submit-btn" type="submit"
-                            class="w-full inline-flex items-center justify-center rounded-md bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-orange-600">Lanjutkan
+                            class="w-full inline-flex items-center justify-center rounded-md bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-teal-600">Lanjutkan
                         Pembayaran</button>
                     <div id="wa-block-overlay"
                          class="hidden absolute inset-0 bg-white/70 backdrop-blur-[1px] flex items-center justify-center text-sm text-gray-700 rounded-md"

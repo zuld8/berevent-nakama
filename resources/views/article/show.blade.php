@@ -33,7 +33,7 @@
             <div class="text-sm text-gray-500">{{ optional($a->published_at)->format('d M Y') ?? '—' }}</div>
             <div class="text-sm text-gray-600">Campaign: <a class="text-sky-600 hover:underline" href="{{ route('campaign.show', $c->slug) }}">{{ $c->title }}</a></div>
             @if ($a->payout?->amount)
-                <div class="inline-block rounded-full bg-orange-50 px-2 py-1 text-xs text-orange-700 ring-1 ring-orange-200">Anggaran: Rp {{ number_format((float)$a->payout->amount, 2, ',', '.') }}</div>
+                <div class="inline-block rounded-full bg-teal-50 px-2 py-1 text-xs text-teal-700 ring-1 ring-teal-200">Anggaran: Rp {{ number_format((float)$a->payout->amount, 2, ',', '.') }}</div>
             @endif
             @if ($a->cover_url)
                 <img src="{{ $a->cover_url }}" alt="Cover" class="w-full rounded-md object-cover" />
@@ -62,8 +62,8 @@
     @endphp
     <div class="fixed inset-x-0 bottom-0 z-30 bg-white/95 backdrop-blur border-t border-gray-200">
         <div class="mx-auto max-w-7xl px-4 py-3 flex items-center gap-3">
-            <button type="button" id="fab-share-trigger" class="inline-flex items-center justify-center rounded-md border border-orange-500 bg-white px-4 py-2.5 text-sm font-semibold text-orange-600 shadow-sm hover:bg-orange-50" aria-label="Bagikan">Bagikan</button>
-            <a href="{{ route('campaign.donate.form', $c->slug) }}" class="flex-1 inline-flex items-center justify-center rounded-md bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-orange-600">Donasi</a>
+            <button type="button" id="fab-share-trigger" class="inline-flex items-center justify-center rounded-md border border-teal-500 bg-white px-4 py-2.5 text-sm font-semibold text-teal-600 shadow-sm hover:bg-teal-50" aria-label="Bagikan">Bagikan</button>
+            <a href="{{ route('campaign.donate.form', $c->slug) }}" class="flex-1 inline-flex items-center justify-center rounded-md bg-teal-500 px-4 py-2.5 text-sm font-semibold text-white shadow hover:bg-teal-600">Donasi</a>
             <div id="fab-share-popover" class="pointer-events-auto invisible absolute bottom-14 right-4 translate-y-2 opacity-0 transition-all duration-150 ease-out">
                 <div class="flex items-center gap-3 rounded-xl bg-white p-2 shadow-lg ring-1 ring-gray-200">
                     <a href="https://wa.me/?text={{ $encTextFab }}%20{{ $encUrlFab }}" target="_blank" rel="noopener" class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-90" aria-label="WhatsApp">

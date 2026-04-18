@@ -82,17 +82,29 @@
                                 </form>
                             </div>
 
-                            {{-- Qty (only for ticket, not replay) --}}
+                            {{-- Qty stepper (only for ticket, not replay) --}}
                             @if (!$isReplay)
                                 <div class="mt-2">
                                     <form method="post" action="{{ route('cart.update', $it['slug']) }}"
-                                          class="inline-flex items-center gap-2">
+                                          class="inline-flex items-center gap-2" id="form-qty-{{ $loop->index }}">
                                         @csrf
-                                        <label class="text-xs text-gray-600">Jumlah</label>
-                                        <input type="number" name="qty" min="1" value="{{ $it['qty'] ?? 1 }}"
-                                               class="w-16 rounded-md border-gray-200 text-sm" />
-                                        <button class="rounded-md bg-teal-600 px-2 py-1 text-xs font-medium text-white hover:bg-teal-700"
-                                                type="submit">Ubah</button>
+                                        <input type="hidden" name="qty" id="qty-val-{{ $loop->index }}"
+                                               value="{{ $it['qty'] ?? 1 }}" />
+                                        <label class="text-xs text-gray-500 mr-1">Jumlah</label>
+                                        {{-- Minus --}}
+                                        <button type="button"
+                                                onclick="stepQty({{ $loop->index }}, -1)"
+                                                class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 text-base font-bold">−</button>
+                                        {{-- Angka --}}
+                                        <span id="qty-display-{{ $loop->index }}"
+                                              class="min-w-[1.75rem] text-center text-sm font-semibold text-gray-800">{{ $it['qty'] ?? 1 }}</span>
+                                        {{-- Plus --}}
+                                        <button type="button"
+                                                onclick="stepQty({{ $loop->index }}, 1)"
+                                                class="inline-flex h-7 w-7 items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100 text-base font-bold">+</button>
+                                        {{-- Ubah --}}
+                                        <button type="submit"
+                                                class="ml-1 rounded-lg bg-teal-600 px-3 py-1 text-xs font-semibold text-white hover:bg-teal-700">Ubah</button>
                                     </form>
                                 </div>
                             @else
@@ -124,4 +136,16 @@
             </div>
         @endif
     </main>
+
+    <script>
+    function stepQty(index, delta) {
+        var hidden  = document.getElementById('qty-val-' + index);
+        var display = document.getElementById('qty-display-' + index);
+        if (!hidden || !display) return;
+        var current = parseInt(hidden.value) || 1;
+        var next = Math.max(1, current + delta);
+        hidden.value   = next;
+        display.textContent = next;
+    }
+    </script>
 @endsection

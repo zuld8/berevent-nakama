@@ -492,9 +492,9 @@
             @if ($isExpired)
                 {{-- Event sudah berakhir --}}
                 @if ($event->hasReplay() && $canWatch)
-                    {{-- Already has access — scroll ke video --}}
+                    {{-- Already has access --}}
                     <button onclick="document.querySelector('.bg-gray-900')?.scrollIntoView({behavior:'smooth'})"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-teal-700">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
                             <path fill-rule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd"/>
                         </svg>
@@ -502,29 +502,41 @@
                     </button>
 
                 @elseif ($event->hasReplay() && $replayPrice !== null)
-                    {{-- Replay tersedia untuk dibeli via keranjang --}}
+                    {{-- Replay untuk dibeli: Beli Rekaman | 🛒 --}}
                     @guest
                         <a href="{{ route('login') }}"
                            class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-teal-700">
                             🔐 Login untuk Beli Rekaman
                         </a>
                     @else
-                        <form method="post" action="{{ route('cart.replay.add', $event->slug) }}">
-                            @csrf
-                            <button type="submit"
-                                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-teal-700">
-                                🎬 Tambah Rekaman ke Keranjang
-                                @if ($replayPrice > 0)
-                                    — Rp {{ number_format($replayPrice, 0, ',', '.') }}
-                                @else
-                                    (Gratis)
-                                @endif
-                            </button>
-                        </form>
+                        <div class="flex items-center gap-2">
+                            {{-- Primary: Beli Rekaman Sekarang --}}
+                            <form method="post" action="{{ route('cart.replay.buy-now', $event->slug) }}" class="flex-1">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-teal-700 active:scale-95 transition-transform">
+                                    🎬 Beli Rekaman
+                                    @if ($replayPrice > 0)
+                                        <span class="opacity-80 text-xs font-normal">Rp {{ number_format($replayPrice, 0, ',', '.') }}</span>
+                                    @endif
+                                </button>
+                            </form>
+                            {{-- Secondary: Tambah ke Keranjang saja --}}
+                            <form method="post" action="{{ route('cart.replay.add', $event->slug) }}">
+                                @csrf
+                                <button type="submit" title="Tambah ke Keranjang"
+                                        class="inline-flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-teal-600 px-3 py-2.5 text-teal-700 hover:bg-teal-50 active:scale-95 transition-transform">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                    </svg>
+                                    <span class="text-[10px] font-semibold leading-none">Keranjang</span>
+                                </button>
+                            </form>
+                        </div>
                     @endguest
 
                 @else
-                    <button disabled class="inline-flex w-full items-center justify-center rounded-xl bg-gray-400 px-4 py-3 text-sm font-medium text-white cursor-not-allowed">
+                    <button disabled class="inline-flex w-full items-center justify-center rounded-xl bg-gray-300 px-4 py-3 text-sm font-medium text-gray-500 cursor-not-allowed">
                         ⛔ Event Sudah Berakhir
                     </button>
                 @endif
@@ -532,20 +544,57 @@
             @else
                 {{-- Event masih aktif --}}
                 @guest
-                    <a href="{{ route('login') }}" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Daftar Sekarang</a>
+                    <a href="{{ route('login') }}"
+                       class="inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-teal-700">
+                        Daftar Sekarang
+                    </a>
                 @else
                     @if (($event->price_type ?? 'fixed') === 'fixed')
-                        <form method="post" action="{{ route('cart.add', $event->slug) }}">
-                            @csrf
-                            <button type="submit" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Tambahkan Ke Keranjang</button>
-                        </form>
+                        {{-- Fixed price: Beli Sekarang | 🛒 --}}
+                        <div class="flex items-center gap-2">
+                            {{-- Primary: Beli Sekarang (langsung checkout) --}}
+                            <form method="post" action="{{ route('cart.buy-now', $event->slug) }}" class="flex-1">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-teal-700 active:scale-95 transition-transform">
+                                    Beli Sekarang
+                                </button>
+                            </form>
+                            {{-- Secondary: Tambah ke Keranjang saja --}}
+                            <form method="post" action="{{ route('cart.add', $event->slug) }}">
+                                @csrf
+                                <button type="submit" title="Tambah ke Keranjang"
+                                        class="inline-flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-teal-600 px-3 py-2.5 text-teal-700 hover:bg-teal-50 active:scale-95 transition-transform">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                    </svg>
+                                    <span class="text-[10px] font-semibold leading-none">Keranjang</span>
+                                </button>
+                            </form>
+                        </div>
                     @else
-                        <button type="button" onclick="openModal()" class="inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">Tambahkan Ke Keranjang</button>
+                        {{-- Donation/Infak: modal → Beli Sekarang | modal → 🛒 --}}
+                        <div class="flex items-center gap-2">
+                            {{-- Primary: buka modal lalu buy now --}}
+                            <button type="button" onclick="openModal('buynow')"
+                                    class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-teal-700 active:scale-95 transition-transform">
+                                Beli Sekarang
+                            </button>
+                            {{-- Secondary: buka modal lalu add to cart saja --}}
+                            <button type="button" onclick="openModal('addcart')"
+                                    class="inline-flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-teal-600 px-3 py-2.5 text-teal-700 hover:bg-teal-50 active:scale-95 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
+                                </svg>
+                                <span class="text-[10px] font-semibold leading-none">Keranjang</span>
+                            </button>
+                        </div>
                     @endif
                 @endguest
             @endif
         </div>
     </div>
+
 
     <script>
         // Hide global bottom nav on detail page
@@ -560,7 +609,16 @@
         })();
 
         // Price selection modal functions
-        function openModal() {
+        var _modalMode = 'buynow'; // 'buynow' | 'addcart'
+        var _buyNowUrl = '{{ route('cart.buy-now', $event->slug) }}';
+        var _addCartUrl = '{{ route('cart.add', $event->slug) }}';
+
+        function openModal(mode) {
+            _modalMode = mode || 'buynow';
+            var form = document.getElementById('priceForm');
+            var btn  = document.getElementById('submitBtn');
+            if (form) form.action = (_modalMode === 'buynow') ? _buyNowUrl : _addCartUrl;
+            if (btn)  btn.textContent = (_modalMode === 'buynow') ? 'Beli Sekarang' : 'Tambahkan ke Keranjang';
             document.getElementById('priceModal').classList.remove('hidden');
             document.getElementById('priceModal').classList.add('flex');
         }

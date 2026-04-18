@@ -122,6 +122,34 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('status', 'Rekaman sudah ada di keranjang');
     }
 
+    /**
+     * Beli Sekarang — add ticket to cart then redirect straight to checkout.
+     */
+    public function buyNow(Request $request, Event $event)
+    {
+        // Reuse add() logic then redirect to checkout
+        $response = $this->add($request, $event);
+
+        // If add() returned a redirect back with error, pass it through
+        if ($response->isRedirect(route('cart.index'))) {
+            return redirect()->route('order.checkout');
+        }
+        return $response; // redirect back with error
+    }
+
+    /**
+     * Beli Rekaman Sekarang — add replay to cart then redirect straight to checkout.
+     */
+    public function buyNowReplay(Request $request, Event $event)
+    {
+        $response = $this->addReplay($request, $event);
+
+        if ($response->isRedirect(route('cart.index'))) {
+            return redirect()->route('order.checkout');
+        }
+        return $response;
+    }
+
     public function update(Request $request, Event $event)
     {
         $qty = max(0, (int) $request->input('qty', 1));

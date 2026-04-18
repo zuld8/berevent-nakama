@@ -47,6 +47,9 @@ Route::middleware('auth')->group(function () {
     // Replay items
     Route::post('/cart/replay/add/{event:slug}', [CartController::class, 'addReplay'])->name('cart.replay.add');
     Route::post('/cart/replay/remove/{event:slug}', [CartController::class, 'removeReplay'])->name('cart.replay.remove');
+    // Buy Now (add to cart + redirect to checkout)
+    Route::post('/cart/buy-now/{event:slug}', [CartController::class, 'buyNow'])->name('cart.buy-now');
+    Route::post('/cart/replay/buy-now/{event:slug}', [CartController::class, 'buyNowReplay'])->name('cart.replay.buy-now');
 });
 
 // Orders (requires auth)

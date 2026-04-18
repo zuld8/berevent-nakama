@@ -545,7 +545,7 @@
                 {{-- Event masih aktif --}}
                 @guest
                     <a href="{{ route('login') }}"
-                       class="inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-teal-700">
+                       class="inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-teal-700">
                         Daftar Sekarang
                     </a>
                 @else
@@ -556,7 +556,7 @@
                             <form method="post" action="{{ route('cart.buy-now', $event->slug) }}" class="flex-1">
                                 @csrf
                                 <button type="submit"
-                                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-teal-700 active:scale-95 transition-transform">
+                                        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-teal-700 active:scale-95 transition-transform">
                                     Beli Sekarang
                                 </button>
                             </form>
@@ -564,8 +564,8 @@
                             <form method="post" action="{{ route('cart.add', $event->slug) }}">
                                 @csrf
                                 <button type="submit" title="Tambah ke Keranjang"
-                                        class="inline-flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-teal-600 px-3 py-2.5 text-teal-700 hover:bg-teal-50 active:scale-95 transition-transform">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+                                        class="inline-flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-teal-600 px-2.5 py-1.5 text-teal-700 hover:bg-teal-50 active:scale-95 transition-transform">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-4 w-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
                                     </svg>
                                     <span class="text-[10px] font-semibold leading-none">Keranjang</span>
@@ -577,13 +577,13 @@
                         <div class="flex items-center gap-2">
                             {{-- Primary: buka modal lalu buy now --}}
                             <button type="button" onclick="openModal('buynow')"
-                                    class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white shadow hover:bg-teal-700 active:scale-95 transition-transform">
+                                    class="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-teal-700 active:scale-95 transition-transform">
                                 Beli Sekarang
                             </button>
                             {{-- Secondary: buka modal lalu add to cart saja --}}
                             <button type="button" onclick="openModal('addcart')"
-                                    class="inline-flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-teal-600 px-3 py-2.5 text-teal-700 hover:bg-teal-50 active:scale-95 transition-transform">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-5 w-5">
+                                    class="inline-flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 border-teal-600 px-2.5 py-1.5 text-teal-700 hover:bg-teal-50 active:scale-95 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-4 w-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
                                 </svg>
                                 <span class="text-[10px] font-semibold leading-none">Keranjang</span>

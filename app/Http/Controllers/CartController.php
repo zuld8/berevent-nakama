@@ -47,11 +47,13 @@ class CartController extends Controller
         }
         // Handle dynamic price (donation)
         elseif (($event->price_type ?? 'fixed') !== 'fixed') {
+            $minPrice    = (int) ($event->min_price ?? 10000); // pakai min_price event, default 10.000
             $customPrice = $request->input('custom_price');
-            if ($customPrice !== null && (float)$customPrice >= 10000) {
+            if ($customPrice !== null && (float)$customPrice >= $minPrice) {
                 $unitPrice = (float) $customPrice;
             } else {
-                return redirect()->back()->with('error', 'Silakan pilih nominal donasi minimal Rp 10.000');
+                $formatted = 'Rp ' . number_format($minPrice, 0, ',', '.');
+                return redirect()->back()->with('error', "Silakan pilih nominal donasi minimal {$formatted}");
             }
         }
 

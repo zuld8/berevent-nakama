@@ -62,6 +62,13 @@ class EventResource extends Resource
                             ->live(),
                         Forms\Components\TextInput::make('price')->label('Harga (IDR)')->numeric()
                             ->visible(fn (callable $get) => $get('price_type') === 'fixed'),
+                        Forms\Components\TextInput::make('min_price')
+                            ->label('Minimal Infak (IDR)')
+                            ->numeric()
+                            ->minValue(1000)
+                            ->placeholder('Contoh: 10000')
+                            ->helperText('Kosongkan = minimal default Rp 10.000. Isi angka untuk atur batas minimum infak.')
+                            ->visible(fn (callable $get) => $get('price_type') === 'donation'),
                         Forms\Components\Select::make('status')->label('Status')
                             ->options([
                                 'draft' => 'Draft',

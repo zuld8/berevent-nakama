@@ -417,41 +417,52 @@
 
     {{-- Price Selection Modal for Dynamic Pricing --}}
     @if (($event->price_type ?? 'fixed') !== 'fixed' && !$isExpired)
+        @php $minInfak = (int) ($event->min_price ?? 10000); @endphp
         <div id="priceModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
             <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-                <h3 class="text-lg font-semibold text-gray-900">Pilih Nominal Donasi</h3>
-                <p class="mt-1 text-sm text-gray-600">Silakan pilih atau masukkan nominal donasi Anda</p>
-                
+                <h3 class="text-lg font-semibold text-gray-900">Pilih Nominal Infak</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    Minimum infak: <strong class="text-teal-700">Rp {{ number_format($minInfak, 0, ',', '.') }}</strong>
+                </p>
+
                 <form method="post" action="{{ route('cart.add', $event->slug) }}" id="priceForm">
                     @csrf
                     <input type="hidden" name="custom_price" id="selectedPrice" value="">
-                    
+
                     <div class="mt-4 grid grid-cols-2 gap-3">
-                        <button type="button" onclick="selectPrice(50000)" class="price-option rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 hover:border-sky-500 hover:bg-sky-50 focus:border-sky-500 focus:bg-sky-50 focus:outline-none">
-                            Rp 50.000
-                        </button>
-                        <button type="button" onclick="selectPrice(100000)" class="price-option rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 hover:border-sky-500 hover:bg-sky-50 focus:border-sky-500 focus:bg-sky-50 focus:outline-none">
-                            Rp 100.000
-                        </button>
-                        <button type="button" onclick="selectPrice(200000)" class="price-option rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 hover:border-sky-500 hover:bg-sky-50 focus:border-sky-500 focus:bg-sky-50 focus:outline-none">
-                            Rp 200.000
-                        </button>
-                        <button type="button" onclick="selectCustomPrice()" class="price-option rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 hover:border-sky-500 hover:bg-sky-50 focus:border-sky-500 focus:bg-sky-50 focus:outline-none">
+                        @foreach ([50000, 100000, 200000, 500000] as $opt)
+                            @if ($opt >= $minInfak)
+                                <button type="button" onclick="selectPrice({{ $opt }})"
+                                        class="price-option rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 hover:border-teal-500 hover:bg-teal-50 focus:border-teal-500 focus:bg-teal-50 focus:outline-none">
+                                    Rp {{ number_format($opt, 0, ',', '.') }}
+                                </button>
+                            @endif
+                        @endforeach
+                        <button type="button" onclick="selectCustomPrice()"
+                                class="price-option rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 hover:border-teal-500 hover:bg-teal-50 focus:border-teal-500 focus:bg-teal-50 focus:outline-none">
                             Nominal Lain
                         </button>
                     </div>
 
                     <div id="customPriceInput" class="mt-4 hidden">
-                        <label for="customAmount" class="block text-sm font-medium text-gray-700">Masukkan Nominal (Rp)</label>
-                        <input type="number" id="customAmount" min="10000" step="1000" placeholder="Contoh: 150000" class="mt-1 block w-full rounded-xl border-gray-300 px-4 py-3 text-sm shadow-sm focus:border-sky-500 focus:ring-sky-500">
+                        <label for="customAmount" class="block text-sm font-medium text-gray-700">
+                            Masukkan Nominal (Rp) — minimal Rp {{ number_format($minInfak, 0, ',', '.') }}
+                        </label>
+                        <input type="number" id="customAmount"
+                               min="{{ $minInfak }}" step="1000"
+                               placeholder="Contoh: {{ number_format($minInfak, 0, '', '') }}"
+                               class="mt-1 block w-full rounded-xl border-gray-300 px-4 py-3 text-sm shadow-sm focus:border-teal-500 focus:ring-teal-500">
                     </div>
 
                     <div class="mt-6 flex gap-3">
-                        <button type="button" onclick="closeModal()" class="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        <button type="button" onclick="closeModal()"
+                                class="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50">
                             Batal
                         </button>
-                        <button type="submit" class="flex-1 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700 disabled:opacity-50 disabled:cursor-not-allowed" id="submitBtn" disabled>
-                            Tambahkan
+                        <button type="submit"
+                                class="flex-1 rounded-xl bg-teal-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                id="submitBtn" disabled>
+                            Tambahkan ke Keranjang
                         </button>
                     </div>
                 </form>
@@ -597,10 +608,11 @@
         // Handle custom amount input
         document.addEventListener('DOMContentLoaded', function() {
             const customInput = document.getElementById('customAmount');
+            const minInfak = {{ $minInfak ?? 10000 }};
             if (customInput) {
                 customInput.addEventListener('input', function() {
                     const value = parseInt(this.value) || 0;
-                    if (value >= 10000) {
+                    if (value >= minInfak) {
                         document.getElementById('selectedPrice').value = value;
                         document.getElementById('submitBtn').disabled = false;
                     } else {

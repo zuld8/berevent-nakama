@@ -21,6 +21,7 @@ class Event extends Model
         'end_date',
         'price_type',
         'price',
+        'min_price',
         'cover_path',
         'type',
         'description',

@@ -483,22 +483,25 @@
                     </button>
 
                 @elseif ($event->hasReplay() && $replayPrice !== null)
-                    {{-- Replay tersedia untuk dibeli --}}
+                    {{-- Replay tersedia untuk dibeli via keranjang --}}
                     @guest
                         <a href="{{ route('login') }}"
-                           class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
+                           class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-teal-700">
                             🔐 Login untuk Beli Rekaman
                         </a>
                     @else
-                        <a href="{{ route('event.replay.checkout', $event->slug) }}"
-                           class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-sky-700">
-                            🎬 Beli Rekaman
-                            @if ($replayPrice > 0)
-                                — Rp {{ number_format($replayPrice, 0, ',', '.') }}
-                            @else
-                                (Gratis)
-                            @endif
-                        </a>
+                        <form method="post" action="{{ route('cart.replay.add', $event->slug) }}">
+                            @csrf
+                            <button type="submit"
+                                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 text-sm font-medium text-white shadow hover:bg-teal-700">
+                                🎬 Tambah Rekaman ke Keranjang
+                                @if ($replayPrice > 0)
+                                    — Rp {{ number_format($replayPrice, 0, ',', '.') }}
+                                @else
+                                    (Gratis)
+                                @endif
+                            </button>
+                        </form>
                     @endguest
 
                 @else

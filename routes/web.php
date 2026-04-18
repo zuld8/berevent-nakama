@@ -44,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/update/{event:slug}', [CartController::class, 'update'])->name('cart.update');
     Route::post('/cart/remove/{event:slug}', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+    // Replay items
+    Route::post('/cart/replay/add/{event:slug}', [CartController::class, 'addReplay'])->name('cart.replay.add');
+    Route::post('/cart/replay/remove/{event:slug}', [CartController::class, 'removeReplay'])->name('cart.replay.remove');
 });
 
 // Orders (requires auth)

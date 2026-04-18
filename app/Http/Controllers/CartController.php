@@ -57,13 +57,14 @@ class CartController extends Controller
 
         if (!isset($items[$key])) {
             $items[$key] = [
-                'id' => $event->id,
-                'slug' => $event->slug,
-                'title' => $event->title,
-                'cover_url' => $event->cover_url,
+                'id'         => $event->id,
+                'slug'       => $event->slug,
+                'title'      => $event->title,
+                'cover_url'  => $event->cover_url,
                 'unit_price' => $unitPrice,
                 'price_type' => $event->price_type,
-                'qty' => 1,
+                'qty'        => 1,
+                'item_type'  => 'ticket',
             ];
         } else {
             $items[$key]['qty'] = (int)($items[$key]['qty'] ?? 1) + 1;
@@ -74,6 +75,49 @@ class CartController extends Controller
         }
         $this->putItems($request, $items);
         return redirect()->route('cart.index')->with('status', 'Ditambahkan ke keranjang');
+    }
+
+    /**
+     * Tambahkan rekaman (replay) event ke keranjang.
+     * Key: 'replay:{slug}' — selalu qty 1, tidak bisa multiple.
+     */
+    public function addReplay(Request $request, Event $event)
+    {
+        $userId = auth()->id();
+
+        if (! $event->hasReplay()) {
+            return redirect()->back()->with('error', 'Event ini tidak memiliki rekaman.');
+        }
+
+        $price = $event->replayPriceForSale();
+        if ($price === null) {
+            return redirect()->back()->with('error', 'Rekaman event ini tidak dijual secara publik.');
+        }
+
+        if ($event->userHasTicket($userId) || $event->userHasBoughtReplay($userId)) {
+            return redirect()->route('event.show', $event->slug)
+                ->with('success', 'Anda sudah memiliki akses ke rekaman ini.');
+        }
+
+        $items = $this->getItems($request);
+        $key = 'replay:' . $event->slug;
+
+        if (!isset($items[$key])) {
+            $items[$key] = [
+                'id'         => $event->id,
+                'slug'       => $event->slug,
+                'title'      => '[Rekaman] ' . $event->title,
+                'cover_url'  => $event->cover_url,
+                'unit_price' => (float) $price,
+                'price_type' => 'fixed',
+                'qty'        => 1,
+                'item_type'  => 'replay',
+            ];
+            $this->putItems($request, $items);
+            return redirect()->route('cart.index')->with('status', 'Rekaman ditambahkan ke keranjang');
+        }
+
+        return redirect()->route('cart.index')->with('status', 'Rekaman sudah ada di keranjang');
     }
 
     public function update(Request $request, Event $event)
@@ -103,10 +147,20 @@ class CartController extends Controller
         return redirect()->route('cart.index');
     }
 
+    public function removeReplay(Request $request, Event $event)
+    {
+        $items = $this->getItems($request);
+        $key = 'replay:' . $event->slug;
+        if (isset($items[$key])) {
+            unset($items[$key]);
+            $this->putItems($request, $items);
+        }
+        return redirect()->route('cart.index');
+    }
+
     public function clear(Request $request)
     {
         $request->session()->forget('cart.items');
         return redirect()->route('cart.index');
     }
 }
-

@@ -60,8 +60,16 @@ class EventResource extends Resource
                             ->options(['fixed' => 'Harga Tetap', 'donation' => 'Infak Terbaik / Dinamis'])
                             ->default('fixed')
                             ->live(),
-                        Forms\Components\TextInput::make('price')->label('Harga (IDR)')->numeric()
-                            ->visible(fn (callable $get) => $get('price_type') === 'fixed'),
+                        Forms\Components\TextInput::make('price')
+                            ->label(fn (callable $get) => $get('price_type') === 'donation'
+                                ? 'Harga Coret / Referensi (IDR)'
+                                : 'Harga (IDR)')
+                            ->numeric()
+                            ->placeholder(fn (callable $get) => $get('price_type') === 'donation' ? 'Contoh: 100000' : '0')
+                            ->helperText(fn (callable $get) => $get('price_type') === 'donation'
+                                ? 'Opsional. Ditampilkan sebagai harga coret di atas tulisan "Infaq Terbaik". Kosongkan jika tidak ingin tampilkan harga coret.'
+                                : null)
+                            ->visible(fn (callable $get) => in_array($get('price_type'), ['fixed', 'donation'])),
                         Forms\Components\TextInput::make('min_price')
                             ->label('Minimal Infak (IDR)')
                             ->numeric()

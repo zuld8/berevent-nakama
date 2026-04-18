@@ -129,8 +129,16 @@
                 <div class="flex items-start justify-between gap-3">
                     <h1 class="text-lg font-semibold text-gray-900 leading-6 w-2/3">{{ $event->title }}</h1>
                     <div class="text-right w-1/3">
-                        <span class="block text-[12px] text-gray-500 ">Mulai dari</span>
-                        <span class="block text-lg font-bold text-gray-900">{{ $priceLabel }}</span>
+                        @if (($event->price_type ?? 'fixed') !== 'fixed')
+                            {{-- Infak/Donasi --}}
+                            @if ((float)($event->price ?? 0) > 0)
+                                <span class="block text-xs text-gray-400 line-through">Rp {{ number_format((float)$event->price, 0, ',', '.') }}</span>
+                            @endif
+                            <span class="block text-base font-bold text-teal-700">Infaq Terbaik</span>
+                        @else
+                            <span class="block text-[12px] text-gray-500">Mulai dari</span>
+                            <span class="block text-lg font-bold text-gray-900">{{ $priceLabel }}</span>
+                        @endif
                     </div>
                 </div>
                 @if ($event->organization)

@@ -79,8 +79,16 @@
             </div>
 
             <div class="mt-1 text-[13px] text-gray-500">
-                <span>Mulai dari</span>
-                <span class="ml-1 text-base font-bold text-gray-900">{{ $priceLabel }}</span>
+                @if (($event->price_type ?? 'fixed') !== 'fixed')
+                    {{-- Infak / Donasi: harga coret + "Infaq Terbaik" --}}
+                    @if ((float)($event->price ?? 0) > 0)
+                        <span class="line-through text-gray-400 text-xs">Rp {{ number_format((float)$event->price, 0, ',', '.') }}</span>
+                    @endif
+                    <div class="font-bold text-teal-700 text-sm leading-tight">Infaq Terbaik</div>
+                @else
+                    <span>Mulai dari</span>
+                    <span class="ml-1 text-base font-bold text-gray-900">{{ $priceLabel }}</span>
+                @endif
             </div>
         </div>
     </div>

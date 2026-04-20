@@ -8,6 +8,8 @@
 
         <form method="post" action="{{ route('order.place') }}">
             @csrf
+
+            {{-- Order Items --}}
             <div class="space-y-3 mb-4">
                 @foreach ($items as $it)
                     <div class="flex items-start gap-3 rounded-xl border border-gray-200 bg-white p-3">
@@ -25,7 +27,10 @@
                                 @if (($it['price_type'] ?? 'fixed') !== 'fixed')
                                     <div class="text-right">
                                         <label class="block text-[12px] text-gray-500">Nominal</label>
-                                        <input type="number" name="prices[{{ $it['slug'] }}]" min="0" step="1000" value="{{ (int)($it['unit_price'] ?? 0) }}" class="w-28 rounded-md border-gray-200 text-sm text-right px-2 py-1" />
+                                        <input type="number" name="prices[{{ $it['slug'] }}]"
+                                               min="0" step="1000"
+                                               value="{{ (int)($it['unit_price'] ?? 0) }}"
+                                               class="w-28 rounded-md border-gray-200 text-sm text-right px-2 py-1" />
                                     </div>
                                 @else
                                     <div class="text-right">
@@ -39,59 +44,88 @@
                 @endforeach
             </div>
 
+            {{-- Total --}}
             <div class="rounded-xl border border-gray-200 bg-white p-4 flex items-center justify-between">
                 <div class="text-sm text-gray-600">Total Estimasi</div>
                 <div class="text-lg font-semibold text-gray-900">Rp {{ number_format($total, 0, ',', '.') }}</div>
             </div>
 
+            {{-- Payment Method --}}
             <div class="mt-4 rounded-xl border border-gray-200 bg-white p-4">
-                <div class="text-sm font-semibold text-gray-900 mb-2">Metode Pembayaran</div>
+                <div class="text-sm font-semibold text-gray-900 mb-3">Metode Pembayaran</div>
                 <div class="space-y-2 text-sm text-gray-700">
-                    <label class="flex items-start gap-2">
-                        <input type="radio" name="pay_method" value="manual" class="mt-1" checked>
-                        <div>
-                            <div class="font-medium">Transfer Manual</div>
-                            <div class="text-xs text-gray-500">Upload bukti transfer setelah pesanan dibuat.</div>
+
+                    {{-- Manual Transfer --}}
+                    <label id="label-manual"
+                           class="flex items-start gap-3 rounded-xl border-2 border-gray-200 bg-white p-3 cursor-pointer transition-colors hover:bg-gray-50"
+                           onclick="selectMethod('manual')">
+                        <input type="radio" name="pay_method" value="manual" id="pm-manual" class="mt-0.5 shrink-0 accent-teal-600">
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900">Transfer Manual</div>
+                            <div class="text-xs text-gray-500 mt-0.5">Upload bukti transfer setelah pesanan dibuat.</div>
                         </div>
+                        <svg class="mt-0.5 h-5 w-5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
                     </label>
-                    <label class="flex items-start gap-2">
-                        <input type="radio" name="pay_method" value="automatic" class="mt-1">
-                        <div>
-                            <div class="font-medium">Pembayaran Otomatis</div>
-                            <div class="text-xs text-gray-500">Bayar via Midtrans (VA/QRIS/Kartu).</div>
+
+                    {{-- Duitku (Automatic) --}}
+                    <label id="label-automatic"
+                           class="flex items-start gap-3 rounded-xl border-2 border-teal-500 bg-teal-50 p-3 cursor-pointer transition-colors"
+                           onclick="selectMethod('automatic')">
+                        <input type="radio" name="pay_method" value="automatic" id="pm-automatic" class="mt-0.5 shrink-0 accent-teal-600" checked>
+                        <div class="flex-1">
+                            <div class="font-semibold text-gray-900">Pembayaran Otomatis</div>
+                            <div class="text-xs text-gray-500 mt-0.5">Via Duitku — VA Bank, QRIS, e-Wallet, dan lainnya.</div>
+                            {{-- Duitku payment logos --}}
+                            <div class="mt-2 flex flex-wrap items-center gap-2">
+                                <img src="https://images.duitku.com/hotlink-ok/BCA.PNG"  alt="BCA"     class="h-4 w-auto opacity-80" onerror="this.style.display='none'">
+                                <img src="https://images.duitku.com/hotlink-ok/BNI.PNG"  alt="BNI"     class="h-4 w-auto opacity-80" onerror="this.style.display='none'">
+                                <img src="https://images.duitku.com/hotlink-ok/BRI.PNG"  alt="BRI"     class="h-4 w-auto opacity-80" onerror="this.style.display='none'">
+                                <img src="https://images.duitku.com/hotlink-ok/QRIS.PNG" alt="QRIS"    class="h-4 w-auto opacity-80" onerror="this.style.display='none'">
+                                <img src="https://images.duitku.com/hotlink-ok/MD.PNG"   alt="Mandiri" class="h-4 w-auto opacity-80" onerror="this.style.display='none'">
+                                <span class="text-[10px] text-gray-400">& lainnya</span>
+                            </div>
                         </div>
+                        <svg class="mt-0.5 h-5 w-5 text-teal-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
                     </label>
-                </div>
-                <div id="auto-methods" class="mt-3 hidden">
-                    <div class="text-xs text-gray-500 mb-2">Pilih Metode Pembayaran</div>
-                    <div class="space-y-2">
-                        @foreach(($methods ?? []) as $m)
-                            <label class="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:bg-gray-50">
-                                <span class="flex items-center gap-3">
-                                    @if (!empty($m['logo']))
-                                        <img src="{{ $m['logo'] }}" alt="{{ $m['name'] }}" class="h-5 w-auto" />
-                                    @endif
-                                    <span class="text-sm font-medium text-gray-900">{{ $m['name'] }}</span>
-                                    {{-- <span class="text-xs text-gray-500">{{ $catalog->feeText($m) }}</span> --}}
-                                </span>
-                                <input type="radio" name="payment_method" value="{{ $m['id'] }}" class="shrink-0">
-                            </label>
-                        @endforeach
-                    </div>
                 </div>
             </div>
-            <button type="submit" class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-sky-600 px-4 py-3 text-sm font-medium text-white hover:bg-sky-700">Buat Pesanan</button>
+
+            {{-- Submit --}}
+            <button type="submit"
+                    class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-teal-600 px-4 py-3 text-sm font-semibold text-white hover:bg-teal-700 active:scale-[0.98] transition-all shadow-sm">
+                Buat Pesanan
+            </button>
         </form>
     </main>
+
     <script>
-        (function(){
-            const manual = document.querySelector('input[name="pay_method"][value="manual"]');
-            const auto = document.querySelector('input[name="pay_method"][value="automatic"]');
-            const box = document.getElementById('auto-methods');
-            const sync = () => { if (auto && auto.checked) { box && box.classList.remove('hidden'); } else { box && box.classList.add('hidden'); } };
-            manual && manual.addEventListener('change', sync);
-            auto && auto.addEventListener('change', sync);
-            sync();
-        })();
+        function selectMethod(val) {
+            const labels = { manual: 'label-manual', automatic: 'label-automatic' };
+            const inputs = { manual: 'pm-manual', automatic: 'pm-automatic' };
+
+            // Reset all
+            Object.values(labels).forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('border-teal-500', 'bg-teal-50');
+                el.classList.add('border-gray-200', 'bg-white');
+            });
+
+            // Activate selected
+            const active = document.getElementById(labels[val]);
+            active.classList.remove('border-gray-200', 'bg-white');
+            active.classList.add('border-teal-500', 'bg-teal-50');
+
+            // Check the radio
+            document.getElementById(inputs[val]).checked = true;
+        }
+
+        // Init
+        document.querySelectorAll('input[name="pay_method"]').forEach(function(el) {
+            el.addEventListener('change', function() { selectMethod(this.value); });
+        });
     </script>
 @endsection

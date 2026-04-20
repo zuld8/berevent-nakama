@@ -110,6 +110,20 @@ class PaymentController extends Controller
         $meta        = $donation->meta_json ?? [];
         $paymentUrl  = $meta['duitku']['payment_url'] ?? null;
 
+        // Check if a Duitku paymentMethod has been chosen
+        $chosenMethod = (string) data_get($meta, 'duitku.chosen_method', '');
+
+        // If no paymentUrl and no chosenMethod yet → show method picker
+        if (! $paymentUrl && $chosenMethod === '') {
+            $duitku        = new DuitkuService();
+            $baseAmount    = max(10000, (int) round((float) $donation->amount));
+            $duitkuMethods = $duitku->getPaymentMethods($baseAmount);
+            return view('donation.choose_method', [
+                'donation'      => $donation,
+                'duitkuMethods' => $duitkuMethods,
+            ]);
+        }
+
         if (! $paymentUrl) {
             $duitku = new DuitkuService();
 
@@ -135,7 +149,9 @@ class PaymentController extends Controller
             $res = $duitku->createTransactionForDonation($donation, [
                 'override_gross' => $baseAmount,
                 'item_details'   => $items,
+                'paymentMethod'  => $chosenMethod,
             ]);
+
 
             $paymentUrl = $res['paymentUrl'];
 
@@ -346,15 +362,31 @@ class PaymentController extends Controller
         return response('SUCCESS', 200);
     }
 
-    // ── Keep method-choose route working (now just goes to pay) ────────────
+    // ── Method picker for donation (Duitku) ────────────────────────────────
     public function methods(Request $request, string $reference)
     {
-        // Simplified: redirect straight to pay page (Duitku shows all methods)
+        // Simplified: redirect straight to pay page — will show method picker
         return redirect()->route('donation.pay', ['reference' => $reference]);
     }
 
     public function choose(Request $request, string $reference)
     {
-        return redirect()->route('donation.pay', ['reference' => $reference]);
+        $donation = Donation::query()->where('reference', $reference)->firstOrFail();
+
+        $data = $request->validate([
+            'payment_method' => ['required', 'string', 'max:50'],
+        ]);
+
+        $meta = $donation->meta_json ?? [];
+        // Clear any existing paymentUrl so a fresh transaction is created
+        unset($meta['duitku']['payment_url']);
+        $meta['duitku'] = array_merge($meta['duitku'] ?? [], [
+            'chosen_method' => $data['payment_method'],
+        ]);
+        $donation->meta_json = $meta;
+        $donation->save();
+
+        return redirect()->route('donation.pay', ['reference' => $donation->reference]);
     }
 }
+

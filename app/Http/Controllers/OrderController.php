@@ -17,27 +17,35 @@ class OrderController extends Controller
         if (empty($items)) {
             return redirect()->route('cart.index');
         }
+
         $total = 0.0;
         foreach ($items as $it) {
             $total += (float)($it['unit_price'] ?? 0) * (int)($it['qty'] ?? 1);
         }
 
+        // Fetch available Duitku payment methods
+        $duitku  = new DuitkuService();
+        $duitkuMethods = $duitku->getPaymentMethods(max(10000, (int) $total));
+
         return view('order.checkout', [
-            'items' => $items,
-            'total' => $total,
+            'items'         => $items,
+            'total'         => $total,
+            'duitkuMethods' => $duitkuMethods,
         ]);
     }
 
     public function place(Request $request)
     {
         $data = $request->validate([
-            'prices'     => ['array'],
-            'prices.*'   => ['nullable', 'numeric', 'min:0'],
-            'pay_method' => ['nullable', 'in:manual,automatic'],
+            'prices'         => ['array'],
+            'prices.*'       => ['nullable', 'numeric', 'min:0'],
+            'pay_method'     => ['nullable', 'in:manual,automatic'],
+            'payment_method' => ['nullable', 'string', 'max:50'],
         ]);
 
-        $postedPrices = (array) ($data['prices'] ?? []);
-        $payMethod    = (string) ($data['pay_method'] ?? 'manual');
+        $postedPrices  = (array) ($data['prices'] ?? []);
+        $payMethod     = (string) ($data['pay_method'] ?? 'manual');
+        $chosenMethod  = (string) ($data['payment_method'] ?? '');
 
         $items = (array) $request->session()->get('cart.items', []);
         if (empty($items)) {
@@ -66,7 +74,12 @@ class OrderController extends Controller
             'reference'    => $ref,
             'total_amount' => $total,
             'status'       => 'pending',
-            'meta_json'    => ['payment_type' => $payMethod],
+            'meta_json'    => [
+                'payment_type' => $payMethod,
+                'duitku'       => $payMethod === 'automatic' && $chosenMethod !== ''
+                                    ? ['chosen_method' => $chosenMethod]
+                                    : null,
+            ],
         ]);
 
         foreach ($items as $it) {
@@ -95,11 +108,14 @@ class OrderController extends Controller
             return redirect()->route('order.thanks', $order->reference);
         }
 
-        // Route to the correct payment flow
+        // Automatic payment via Duitku
         if ($payMethod === 'automatic') {
-            // Duitku: create transaction and redirect to paymentUrl
+            if ($chosenMethod === '') {
+                return back()->withErrors(['payment_method' => 'Silakan pilih metode pembayaran.'])->withInput();
+            }
+
             $order->loadMissing('items');
-            $duitku = new DuitkuService();
+            $duitku     = new DuitkuService();
             $baseAmount = max(1, (int) round((float) $order->total_amount));
 
             $itemDetails = $order->items->map(fn ($it) => [
@@ -114,15 +130,17 @@ class OrderController extends Controller
                 'override_gross'    => $baseAmount,
                 'item_details'      => $itemDetails,
                 'override_order_id' => $uniqueOrderId,
+                'paymentMethod'     => $chosenMethod,
             ]);
 
             // Persist to order meta
             $meta = $order->meta_json ?? [];
             $meta['duitku'] = [
-                'payment_url'  => $res['paymentUrl'],
-                'reference'    => $res['reference'] ?? null,
-                'order_id'     => $uniqueOrderId,
-                'gross_amount' => $res['grossAmount'],
+                'payment_url'    => $res['paymentUrl'],
+                'reference'      => $res['reference'] ?? null,
+                'order_id'       => $uniqueOrderId,
+                'gross_amount'   => $res['grossAmount'],
+                'chosen_method'  => $chosenMethod,
             ];
             $order->meta_json = $meta;
             $order->save();

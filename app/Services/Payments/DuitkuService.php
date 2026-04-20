@@ -60,6 +60,52 @@ class DuitkuService
     }
 
     /**
+     * Get active payment methods from Duitku API for a given amount.
+     * Signature: sha256(merchantCode + paymentAmount + datetime + apiKey)
+     * Returns array of [ paymentMethod, paymentName, paymentImage, totalFee ]
+     */
+    public function getPaymentMethods(int $amount = 10000): array
+    {
+        try {
+            $datetime  = now()->format('Y-m-d H:i:s');
+            $signature = hash('sha256', $this->merchantCode() . $amount . $datetime . $this->apiKey());
+
+            $endpoint = $this->isProduction()
+                ? 'https://passport.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod'
+                : 'https://sandbox.duitku.com/webapi/api/merchant/paymentmethod/getpaymentmethod';
+
+            $response = Http::withHeaders(['Content-Type' => 'application/json'])
+                ->post($endpoint, [
+                    'merchantcode' => $this->merchantCode(),
+                    'amount'       => $amount,
+                    'datetime'     => $datetime,
+                    'signature'    => $signature,
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (($data['responseCode'] ?? null) === '00' && !empty($data['paymentFee'])) {
+                    return $data['paymentFee'];
+                }
+            }
+        } catch (\Throwable) { /* fall through to static list */ }
+
+        // Static fallback list (common Indonesian payment methods)
+        return [
+            ['paymentMethod' => 'BCA', 'paymentName' => 'BCA Virtual Account',      'paymentImage' => 'https://images.duitku.com/hotlink-ok/BCA.PNG',     'totalFee' => '0'],
+            ['paymentMethod' => 'BNI', 'paymentName' => 'BNI Virtual Account',      'paymentImage' => 'https://images.duitku.com/hotlink-ok/BNI.PNG',     'totalFee' => '0'],
+            ['paymentMethod' => 'BRI', 'paymentName' => 'BRI Virtual Account',      'paymentImage' => 'https://images.duitku.com/hotlink-ok/BRI.PNG',     'totalFee' => '0'],
+            ['paymentMethod' => 'M2',  'paymentName' => 'Mandiri Virtual Account',  'paymentImage' => 'https://images.duitku.com/hotlink-ok/M2.PNG',      'totalFee' => '0'],
+            ['paymentMethod' => 'BT',  'paymentName' => 'Permata Virtual Account',  'paymentImage' => 'https://images.duitku.com/hotlink-ok/PERMATA.PNG', 'totalFee' => '0'],
+            ['paymentMethod' => 'QR',  'paymentName' => 'QRIS',                     'paymentImage' => 'https://images.duitku.com/hotlink-ok/QRIS.PNG',    'totalFee' => '0'],
+            ['paymentMethod' => 'DA',  'paymentName' => 'DANA',                     'paymentImage' => 'https://images.duitku.com/hotlink-ok/DA.PNG',      'totalFee' => '0'],
+            ['paymentMethod' => 'OV',  'paymentName' => 'OVO',                      'paymentImage' => 'https://images.duitku.com/hotlink-ok/OV.PNG',      'totalFee' => '0'],
+            ['paymentMethod' => 'SA',  'paymentName' => 'ShopeePay',               'paymentImage' => 'https://images.duitku.com/hotlink-ok/SA.PNG',      'totalFee' => '0'],
+        ];
+    }
+
+
+    /**
      * Create Duitku transaction for a Donation.
      * Returns: [ paymentUrl, reference, statusCode, statusMessage, vaNumber, qrString ]
      */

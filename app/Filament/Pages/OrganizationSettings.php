@@ -70,11 +70,10 @@ class OrganizationSettings extends Page implements HasForms
                     'bank_account_number' => $this->org->meta_json['payments']['manual']['bank_account_number'] ?? null,
                     'qr_path' => $this->org->meta_json['payments']['manual']['qr_path'] ?? null,
                 ],
-                'midtrans' => [
-                    'is_production' => (bool)($this->org->meta_json['payments']['midtrans']['is_production'] ?? false),
-                    'server_key' => $this->org->meta_json['payments']['midtrans']['server_key'] ?? null,
-                    'client_key' => $this->org->meta_json['payments']['midtrans']['client_key'] ?? null,
-                    'merchant_id' => $this->org->meta_json['payments']['midtrans']['merchant_id'] ?? null,
+                'duitku' => [
+                    'is_production'  => (bool)($this->org->meta_json['payments']['duitku']['is_production'] ?? true),
+                    'merchant_code'  => $this->org->meta_json['payments']['duitku']['merchant_code'] ?? null,
+                    'api_key'        => $this->org->meta_json['payments']['duitku']['api_key'] ?? null,
                 ],
             ],
             'analytics' => [
@@ -172,8 +171,8 @@ class OrganizationSettings extends Page implements HasForms
                             ->columns(2)
                             ->schema([
                                 Toggle::make('payments.enabled.automatic')
-                                    ->label('Pembayaran Otomatis (Midtrans)')
-                                    ->helperText('Aktif/nonaktifkan pilihan pembayaran otomatis.')
+                                    ->label('Pembayaran Otomatis (Duitku)')
+                                    ->helperText('Aktif/nonaktifkan pilihan pembayaran otomatis via Duitku.')
                                     ->inline(false),
                                 Toggle::make('payments.enabled.manual')
                                     ->label('Pembayaran Manual (Transfer)')
@@ -205,24 +204,21 @@ class OrganizationSettings extends Page implements HasForms
                                     ->columnSpanFull(),
                             ])
                             ->columnSpanFull(),
-                        Fieldset::make('Midtrans')
+                        Fieldset::make('Duitku')
                             ->columns(2)
                             ->schema([
-                                Toggle::make('payments.midtrans.is_production')
+                                Toggle::make('payments.duitku.is_production')
                                     ->label('Mode Production')
                                     ->helperText('Nonaktifkan untuk sandbox/test.')
                                     ->inline(false),
-                                TextInput::make('payments.midtrans.merchant_id')
-                                    ->label('Merchant ID')
-                                    ->maxLength(255),
-                                TextInput::make('payments.midtrans.server_key')
-                                    ->label('Server Key')
+                                TextInput::make('payments.duitku.merchant_code')
+                                    ->label('Merchant Code')
+                                    ->placeholder('D21309')
+                                    ->maxLength(50),
+                                TextInput::make('payments.duitku.api_key')
+                                    ->label('API Key')
                                     ->password()
                                     ->revealable()
-                                    ->maxLength(255)
-                                    ->columnSpanFull(),
-                                TextInput::make('payments.midtrans.client_key')
-                                    ->label('Client Key')
                                     ->maxLength(255)
                                     ->columnSpanFull(),
                             ])
@@ -292,16 +288,15 @@ class OrganizationSettings extends Page implements HasForms
             }
         }
         // Overlay structured payment settings into meta_json
-        if (isset($state['payments']['midtrans']) && is_array($state['payments']['midtrans'])) {
-            $mt = $state['payments']['midtrans'];
+        if (isset($state['payments']['duitku']) && is_array($state['payments']['duitku'])) {
+            $dk = $state['payments']['duitku'];
             if (! isset($meta['payments'])) {
                 $meta['payments'] = [];
             }
-            $meta['payments']['midtrans'] = array_merge($meta['payments']['midtrans'] ?? [], [
-                'is_production' => (bool)($mt['is_production'] ?? false),
-                'server_key' => $mt['server_key'] ?? null,
-                'client_key' => $mt['client_key'] ?? null,
-                'merchant_id' => $mt['merchant_id'] ?? null,
+            $meta['payments']['duitku'] = array_merge($meta['payments']['duitku'] ?? [], [
+                'is_production' => (bool)($dk['is_production'] ?? true),
+                'merchant_code' => $dk['merchant_code'] ?? null,
+                'api_key'       => $dk['api_key'] ?? null,
             ]);
         }
         // Enabled methods

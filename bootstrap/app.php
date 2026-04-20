@@ -13,8 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Exclude certain endpoints from CSRF verification
         $middleware->validateCsrfTokens(except: [
+            'duitku/notify',
             'midtrans/notify',
-            'admin/login', // custom HTML login post handler
+            'midtrans/order/notify',
+            'admin/login',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

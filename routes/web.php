@@ -73,7 +73,9 @@ Route::middleware('auth')->group(function(){
         ->name('event.resource.download');
 });
 
-// Midtrans notification for orders
+// Duitku unified webhook (handles both donations and orders)
+Route::post('/duitku/notify', [PaymentController::class, 'notify'])->name('duitku.notify');
+// Legacy aliases (keep for backward compat)
 Route::post('/midtrans/order/notify', [OrderPaymentController::class, 'notify'])->name('midtrans.order.notify');
 Route::middleware('auth')->group(function(){
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');

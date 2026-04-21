@@ -51,7 +51,7 @@
         {{-- Logo --}}
         <div class="mb-6 flex justify-center">
             <a href="{{ route('home') }}" class="inline-flex items-center gap-2">
-                <img src="/logo-icon.svg" alt="Nakama" class="h-9 w-9" onerror="this.style.display='none'">
+                <img src="/images/logo-icon.svg" alt="Nakama" class="h-9 w-9">
                 <span style="font-size:20px;font-weight:700;color:#0D9488;letter-spacing:-0.5px;">Nakama</span>
                 <span style="font-size:20px;font-weight:300;color:#374151;">Project</span>
             </a>

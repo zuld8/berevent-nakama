@@ -158,19 +158,19 @@
                 ">
             </div>
             <h2 class="text-3xl font-bold leading-tight mb-3">
-                Satu Platform untuk<br>Semua Kegiatan Anda
+                Temukan Event,<br>Beli Tiket, Donasi —<br>Semua di Sini
             </h2>
             <p class="text-white/75 text-sm leading-relaxed mb-8">
-                Kelola event, donasi kampanye, dan komunitas dalam satu tempat yang terintegrasi.
+                Nakama Project adalah tempat kamu menemukan event seru, mendukung kampanye kebaikan, dan terhubung dengan komunitas.
             </p>
 
-            {{-- Feature list --}}
+            {{-- Feature list — end user perspective --}}
             <div class="space-y-3 text-left">
                 @foreach([
-                    ['🎟️', 'Manajemen Tiket & Event'],
-                    ['💝', 'Platform Donasi & Infaq'],
-                    ['📊', 'Dashboard Laporan Real-time'],
-                    ['🤝', 'Komunitas Nakama'],
+                    ['🎟️', 'Beli tiket event dengan mudah & aman'],
+                    ['💝', 'Donasi & infaq ke kampanye pilihan kamu'],
+                    ['📱', 'Tiket digital langsung di HP, tanpa repot'],
+                    ['🤝', 'Bergabung dengan komunitas Nakama'],
                 ] as [$icon, $text])
                     <div class="flex items-center gap-3 rounded-xl bg-white/10 px-4 py-3 backdrop-blur-sm">
                         <span class="text-xl">{{ $icon }}</span>
